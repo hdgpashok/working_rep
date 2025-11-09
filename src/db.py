@@ -1,23 +1,22 @@
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 from src.config import Settings
 
 settings = Settings()
 
-engine = create_engine(str(settings.postgres_url))
+engine = create_async_engine(str(settings.postgres_url))
 
 
 @contextmanager
-async def get_session() -> Session:
-    session: Session = Session(engine)
+async def get_session() -> AsyncSession:
+    session: AsyncSession = AsyncSession(engine)
     try:
         yield session
-        session.commit()
+        await session.commit()
     except Exception:
-        session.rollback()
+        await session.rollback()
         raise
     finally:
-        session.close()
+        await session.close()
