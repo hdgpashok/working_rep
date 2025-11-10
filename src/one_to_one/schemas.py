@@ -1,7 +1,8 @@
 import uuid
+from uuid import UUID
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 # Profile Schemas
@@ -16,10 +17,9 @@ class ProfileCreate(ProfileBase):
 
 
 class ProfileRead(ProfileBase):
-    id: uuid
+    id: UUID
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # User Schemas
@@ -33,8 +33,7 @@ class UserCreate(UserBase):
 
 
 class UserRead(UserBase):
-    id: uuid
+    id: UUID
     profile: Optional[ProfileRead] = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
