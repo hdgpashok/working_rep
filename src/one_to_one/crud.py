@@ -6,9 +6,9 @@ from fastapi import HTTPException
 
 from src.db import SessionDep
 from src.one_to_one.models import UserModel, ProfileModel
-from src.one_to_one.schemas import UserCreate, UserRead, UserUpdate
+from src.one_to_one.schemas import UserCreate, UserRead, UserUpdate, UserDelete
 
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
 
 async def create_user_db(user: UserCreate, session: SessionDep) -> None:
@@ -52,3 +52,15 @@ async def update_user_db(user_id: UUID, updated_user: UserUpdate, session: Sessi
 
     session.add(user)
     await session.commit()
+
+
+async def delete_profile_db(user_id: UUID, session: SessionDep):
+    query = delete(ProfileModel).where(ProfileModel.user_id == user_id)
+    await session.execute(query)
+
+
+async def delete_user_db(user_id: UUID, session: SessionDep):
+    await delete_profile_db(user_id, session)
+    query = delete(UserModel).where(UserModel.id == user_id)
+    await session.execute(query)
+

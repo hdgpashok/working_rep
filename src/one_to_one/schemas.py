@@ -27,6 +27,10 @@ class ProfileUpdate(BaseModel):
     bio: Optional[str]
 
 
+class ProfileDelete(ProfileRead):
+    pass
+
+
 # User Schemas
 
 class UserBase(BaseModel):
@@ -47,3 +51,7 @@ class UserRead(UserBase):
 class UserUpdate(BaseModel):
     title: Optional[str] | None
     profile: Optional[ProfileUpdate] | None
+
+
+class UserDelete(UserRead):
+    pass

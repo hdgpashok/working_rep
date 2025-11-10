@@ -4,8 +4,8 @@ from uuid import UUID
 from fastapi import APIRouter
 
 from src.db import SessionDep
-from src.one_to_one.crud import create_user_db, get_users_db, update_user_db
-from src.one_to_one.schemas import UserCreate, UserRead, UserUpdate
+from src.one_to_one.crud import create_user_db, get_users_db, update_user_db, delete_user_db
+from src.one_to_one.schemas import UserCreate, UserRead, UserUpdate, UserDelete
 
 router = APIRouter()
 
@@ -37,3 +37,9 @@ async def edit_user_by_id(
         return {'status': 'user edited'}
     except Exception as e:
         return {'error': f"{e}"}
+
+
+@router.delete("/delete_user")
+async def delete_user(user: UUID, session: SessionDep):
+    await delete_user_db(user, session)
+    return {"status": "user deleted"}
