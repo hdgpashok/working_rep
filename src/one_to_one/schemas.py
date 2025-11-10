@@ -17,7 +17,7 @@ class ProfileCreate(ProfileBase):
 
 
 class ProfileRead(ProfileBase):
-    id: UUID
+    # id: UUID
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -34,6 +34,6 @@ class UserCreate(UserBase):
 
 class UserRead(UserBase):
     id: UUID
-    profile: Optional[ProfileRead] = None
+    profile: Optional[ProfileBase] = None
 
     model_config = ConfigDict(from_attributes=True)
