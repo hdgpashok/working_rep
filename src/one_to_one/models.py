@@ -24,7 +24,7 @@ Base: DeclarativeMeta = declarative_base(metadata=metadata, cls=BaseServiceModel
 class UserModel(Base):
     __tablename__ = 'user'
 
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4())
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     title: Mapped[str] = mapped_column(sa.String())
 
     profile: Mapped['ProfileModel'] = relationship(
@@ -38,7 +38,7 @@ class UserModel(Base):
 class ProfileModel(Base):
     __tablename__ = 'profile'
 
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4())
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     title: Mapped[str] = mapped_column(sa.String())
     bio: Mapped[str] = mapped_column(sa.String())
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))

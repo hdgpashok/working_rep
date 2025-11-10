@@ -1,4 +1,3 @@
-import uuid
 from uuid import UUID
 from typing import Optional
 
@@ -10,6 +9,7 @@ from pydantic import BaseModel, ConfigDict
 class ProfileBase(BaseModel):
     title: str
     bio: str
+    user_id: UUID
 
 
 class ProfileCreate(ProfileBase):
@@ -17,9 +17,14 @@ class ProfileCreate(ProfileBase):
 
 
 class ProfileRead(ProfileBase):
-    # id: UUID
+    id: UUID
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ProfileUpdate(BaseModel):
+    title: Optional[str]
+    bio: Optional[str]
 
 
 # User Schemas
@@ -37,3 +42,8 @@ class UserRead(UserBase):
     profile: Optional[ProfileBase] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserUpdate(BaseModel):
+    title: Optional[str] | None
+    profile: Optional[ProfileUpdate] | None

@@ -2,9 +2,11 @@ from uuid import UUID
 
 from sqlalchemy.orm import selectinload
 
+from fastapi import HTTPException
+
 from src.db import SessionDep
 from src.one_to_one.models import UserModel, ProfileModel
-from src.one_to_one.schemas import UserCreate, UserRead
+from src.one_to_one.schemas import UserCreate, UserRead, UserUpdate
 
 from sqlalchemy import select
 
@@ -27,4 +29,26 @@ async def get_users_db(user_id: UUID, session: SessionDep):
     query = select(UserModel).where(UserModel.id == user_id).options(selectinload(UserModel.profile))
     result = await session.execute(query)
 
-    return result.scalars().all()
+    return result.scalars().first()
+
+
+async def update_user_db(user_id: UUID, updated_user: UserUpdate, session: SessionDep):
+    query = select(UserModel).where(UserModel.id == user_id).options(selectinload(UserModel.profile))
+    result = await session.execute(query)
+    user = result.scalars().first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if updated_user.title is not None:
+        user.title = updated_user.title
+
+    if updated_user.profile is not None:
+        if user.profile:
+            if updated_user.profile.title is not None:
+                user.profile.title = updated_user.profile.title
+            if updated_user.profile.bio is not None:
+                user.profile.bio = updated_user.profile.bio
+
+    session.add(user)
+    await session.commit()

@@ -4,8 +4,8 @@ from uuid import UUID
 from fastapi import APIRouter
 
 from src.db import SessionDep
-from src.one_to_one.crud import create_user_db, get_users_db
-from src.one_to_one.schemas import UserCreate, UserRead
+from src.one_to_one.crud import create_user_db, get_users_db, update_user_db
+from src.one_to_one.schemas import UserCreate, UserRead, UserUpdate
 
 router = APIRouter()
 
@@ -14,13 +14,26 @@ router = APIRouter()
 async def create_user(
         user: UserCreate,
         session: SessionDep) -> Dict[str, str]:
-
     await create_user_db(user, session)
     return {'status': 'user created'}
 
 
 @router.get("/get_users/{user_id}")
-async def get_users(user_id: UUID, session: SessionDep):
+async def get_users(
+        user_id: UUID,
+        session: SessionDep) -> UserRead:
     res = await get_users_db(user_id, session)
 
     return res
+
+
+@router.patch("/edit_user_by_id/{user_id}")
+async def edit_user_by_id(
+        user_id: UUID,
+        edited_user: UserUpdate,
+        session: SessionDep) -> Dict[str, str]:
+    try:
+        await update_user_db(user_id, edited_user, session)
+        return {'status': 'user edited'}
+    except Exception as e:
+        return {'error': f"{e}"}
