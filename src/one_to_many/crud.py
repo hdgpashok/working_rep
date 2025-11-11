@@ -1,5 +1,11 @@
+from sqlalchemy.orm import selectinload
+
+from uuid import UUID
+
 from src.one_to_many.models import AuthorModel, BookModel
-from src.one_to_many.schemas import AuthorCreate
+from src.one_to_many.schemas import AuthorCreate, AuthorRead, AuthorOut
+
+from sqlalchemy import select
 
 from src.db import SessionDep
 
@@ -15,3 +21,10 @@ async def create_author_in_db(author: AuthorCreate, session: SessionDep):
     await session.commit()
 
     return {'status': 'author created'}
+
+
+async def get_author_in_db(author_id: UUID, session: SessionDep):
+    query = select(AuthorModel).where(AuthorModel.id == author_id).options(selectinload(AuthorModel.books))
+    result = await session.execute(query)
+
+    return result.scalars().first()
