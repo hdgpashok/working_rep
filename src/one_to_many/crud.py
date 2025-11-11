@@ -5,7 +5,7 @@ from uuid import UUID
 from src.one_to_many.models import AuthorModel, BookModel
 from src.one_to_many.schemas import AuthorCreate, AuthorRead, AuthorOut, AuthorEdit
 
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
 from fastapi import HTTPException
 
@@ -25,7 +25,7 @@ async def create_author_in_db(author: AuthorCreate, session: SessionDep):
     return {'status': 'author created'}
 
 
-async def get_author_in_db(author_id: UUID, session: SessionDep):
+async def get_author_from_db(author_id: UUID, session: SessionDep):
     query = select(AuthorModel).where(AuthorModel.id == author_id).options(selectinload(AuthorModel.books))
     result = await session.execute(query)
 
@@ -47,3 +47,14 @@ async def edit_author_in_db(author_id: UUID, author: AuthorEdit, session: Sessio
     update_author.books = [BookModel(title=book.title) for book in author.books]
 
     return {'status': 'user edited'}
+
+
+async def delete_book_from_db(author_id: UUID, session: SessionDep):
+    query = delete(BookModel).where(BookModel.author_id == author_id)
+    await session.execute(query)
+
+
+async def delete_author_from_db(author_id: UUID, session: SessionDep):
+    await delete_book_from_db(author_id, session)
+    query = delete(AuthorModel).where(AuthorModel.id == author_id)
+    await session.execute(query)

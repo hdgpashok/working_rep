@@ -6,7 +6,7 @@ from src.db import SessionDep
 
 from src.one_to_many.schemas import AuthorCreate, AuthorRead, AuthorEdit
 
-from src.one_to_many.crud import create_author_in_db, get_author_in_db, edit_author_in_db
+from src.one_to_many.crud import create_author_in_db, get_author_from_db, edit_author_in_db, delete_author_from_db
 
 router = APIRouter()
 
@@ -19,7 +19,7 @@ async def create_author(author: AuthorCreate, session: SessionDep):
 
 @router.get("/get_author/{author_id}")
 async def get_author(author_id: UUID, session: SessionDep):
-    result = await get_author_in_db(author_id, session)
+    result = await get_author_from_db(author_id, session)
 
     return result
 
@@ -29,3 +29,10 @@ async def edit_author(author_id: UUID, author: AuthorEdit, session: SessionDep):
     await edit_author_in_db(author_id, author, session)
 
     return {'status': 'author edited'}
+
+
+@router.delete("/delete_author/{author_id}")
+async def delete_author(author_id: UUID, session: SessionDep):
+    await delete_author_from_db(author_id, session)
+
+    return {'status': 'author deleted'}
