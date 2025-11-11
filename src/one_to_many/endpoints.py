@@ -4,9 +4,9 @@ from fastapi import APIRouter
 
 from src.db import SessionDep
 
-from src.one_to_many.schemas import AuthorCreate, AuthorRead
+from src.one_to_many.schemas import AuthorCreate, AuthorRead, AuthorEdit
 
-from src.one_to_many.crud import create_author_in_db, get_author_in_db
+from src.one_to_many.crud import create_author_in_db, get_author_in_db, edit_author_in_db
 
 router = APIRouter()
 
@@ -22,3 +22,10 @@ async def get_author(author_id: UUID, session: SessionDep):
     result = await get_author_in_db(author_id, session)
 
     return result
+
+
+@router.patch("/edit_author/{author_id}")
+async def edit_author(author_id: UUID, author: AuthorEdit, session: SessionDep):
+    await edit_author_in_db(author_id, author, session)
+
+    return {'status': 'author edited'}

@@ -13,6 +13,10 @@ class BookOut(BaseModel):
     author_id: UUID
 
 
+class BookEdit(BaseModel):
+    title: Optional[str]
+
+
 class AuthorCreate(BaseModel):
     first_name: str
     last_name: str
@@ -26,3 +30,7 @@ class AuthorRead(BaseModel):
 
 class AuthorOut(AuthorCreate):
     id: UUID
+
+
+class AuthorEdit(AuthorCreate):
+    pass
