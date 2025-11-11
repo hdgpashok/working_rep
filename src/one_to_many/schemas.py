@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class BookCreate(BaseModel):
@@ -10,7 +10,7 @@ class BookCreate(BaseModel):
 
 class BookOut(BaseModel):
     title: str
-    author_id: UUID
+    id: UUID
 
 
 class BookEdit(BaseModel):
@@ -30,6 +30,12 @@ class AuthorRead(BaseModel):
 
 class AuthorOut(AuthorCreate):
     id: UUID
+    first_name: str
+    last_name: str
+
+    books: Optional[list[BookOut]]
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AuthorEdit(AuthorCreate):

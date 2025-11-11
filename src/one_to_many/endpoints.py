@@ -4,7 +4,7 @@ from fastapi import APIRouter
 
 from src.db import SessionDep
 
-from src.one_to_many.schemas import AuthorCreate, AuthorRead, AuthorEdit
+from src.one_to_many.schemas import AuthorCreate, AuthorEdit, AuthorOut
 
 from src.one_to_many.crud import create_author_in_db, get_author_from_db, edit_author_in_db, delete_author_from_db
 
@@ -18,7 +18,7 @@ async def create_author(author: AuthorCreate, session: SessionDep):
 
 
 @router.get("/get_author/{author_id}")
-async def get_author(author_id: UUID, session: SessionDep):
+async def get_author(author_id: UUID, session: SessionDep) -> AuthorOut:
     result = await get_author_from_db(author_id, session)
 
     return result
