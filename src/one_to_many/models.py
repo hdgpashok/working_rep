@@ -6,21 +6,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship,
 
 import sqlalchemy as sa
 
-from src.db import engine
-
-
-metadata = sa.MetaData()
-
-
-class BaseServiceModel:
-    """Базовый класс для таблиц сервиса."""
-
-    @classmethod
-    def on_conflict_constraint(cls) -> tuple | None:
-        return None
-
-
-Base: DeclarativeMeta = declarative_base(metadata=metadata, cls=BaseServiceModel)
+from src.one_to_one.models import create_database_tables, Base
 
 
 class AuthorModel(Base):
@@ -44,17 +30,9 @@ class BookModel(Base):
     title: Mapped[str] = mapped_column(sa.String())
 
     author_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("authors.id"))
+
     author: Mapped["AuthorModel"] = relationship("AuthorModel", back_populates="books")
 
 
-async def create_db():
-    try:
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-            print({'status': 'dn created'})
-    except Exception as e:
-        print({'error': f'{e}'})
-
-
 if __name__ == '__main__':
-    asyncio.run(create_db())
+    asyncio.run(create_database_tables())
