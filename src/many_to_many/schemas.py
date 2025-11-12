@@ -8,6 +8,10 @@ class TheatreBase(BaseModel):
     address: str
 
 
+class TheatreRead(TheatreBase):
+    pass
+
+
 class TheatreCreate(TheatreBase):
     pass
 
@@ -19,3 +23,7 @@ class ActorBase(BaseModel):
 
 class ActorCreate(ActorBase):
     theatres: Optional[list[TheatreCreate]] = None
+
+
+class ActorRead(ActorBase):
+    pass
