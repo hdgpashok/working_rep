@@ -12,8 +12,9 @@ class ProfileBase(BaseModel):
     user_id: UUID
 
 
-class ProfileCreate(ProfileBase):
-    pass
+class ProfileCreate(BaseModel):
+    title: str
+    bio: str
 
 
 class ProfileRead(ProfileBase):
