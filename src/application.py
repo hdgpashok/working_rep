@@ -31,9 +31,9 @@ def get_app() -> FastAPI:
         allow_headers=['*'],
     )
 
-    # app.include_router(healthcheck_router)
-    # app.include_router(one_to_one_router)
-    # app.include_router(one_to_many_router)
+    app.include_router(healthcheck_router)
+    app.include_router(one_to_one_router)
+    app.include_router(one_to_many_router)
     app.include_router(many_to_many_router)
 
     return app
