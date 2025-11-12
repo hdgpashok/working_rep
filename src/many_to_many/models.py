@@ -1,7 +1,7 @@
 import asyncio
 import uuid
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -26,13 +26,17 @@ class TheatreModel(Base):
     __tablename__ = 'theatres'
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    name: Mapped[str] = mapped_column(nullable=False)
+    name: Mapped[str] = mapped_column(nullable=False, unique=True)
     address: Mapped[str] = mapped_column(nullable=False)
 
     actors: Mapped[list['ActorModel']] = relationship(
         'ActorModel',
         secondary="actors_and_theatres",
         back_populates='theatres'
+    )
+
+    __table_args__ = (
+        UniqueConstraint('name', 'address', name='uq_theatre_name_address'),
     )
 
 
