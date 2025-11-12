@@ -7,7 +7,7 @@ from src.db import SessionDep
 from src.one_to_one.crud import create_user_db, get_users_db, update_user_db, delete_user_db
 from src.one_to_one.schemas import UserCreate, UserRead, UserUpdate, UserDelete
 
-router = APIRouter()
+router = APIRouter(tags=['Пользователи и профили'])
 
 
 @router.post("/create_user")

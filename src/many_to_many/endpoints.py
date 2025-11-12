@@ -8,7 +8,7 @@ from src.db import SessionDep
 
 from src.many_to_many.schemas import ActorCreate, ActorUpdate
 
-router = APIRouter()
+router = APIRouter(tags=['Актеры и театры'])
 
 
 @router.post("/create_actor")

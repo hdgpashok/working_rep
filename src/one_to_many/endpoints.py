@@ -8,7 +8,7 @@ from src.one_to_many.schemas import AuthorCreate, AuthorEdit, AuthorOut
 
 from src.one_to_many.crud import create_author_in_db, get_author_from_db, edit_author_in_db, delete_author_from_db
 
-router = APIRouter()
+router = APIRouter(tags=['Авторы и книги'])
 
 
 @router.post("/create_author")
