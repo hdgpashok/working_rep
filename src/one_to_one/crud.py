@@ -6,7 +6,7 @@ from fastapi import HTTPException
 
 from src.db import SessionDep
 from src.one_to_one.models import UserModel, ProfileModel
-from src.one_to_one.schemas import UserCreate, UserRead, UserUpdate, UserDelete
+from src.one_to_one.schemas import UserCreate, UserUpdate
 
 from sqlalchemy import select, delete
 
@@ -29,16 +29,16 @@ async def get_users_db(user_id: UUID, session: SessionDep):
     query = select(UserModel).where(UserModel.id == user_id).options(selectinload(UserModel.profile))
     result = await session.execute(query)
 
-    return result.scalars().first()
-
-
-async def update_user_db(user_id: UUID, updated_user: UserUpdate, session: SessionDep):
-    query = select(UserModel).where(UserModel.id == user_id).options(selectinload(UserModel.profile))
-    result = await session.execute(query)
     user = result.scalars().first()
 
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="user not found")
+
+    return user
+
+
+async def update_user_db(user_id: UUID, updated_user: UserUpdate, session: SessionDep):
+    user = await get_users_db(user_id, session)
 
     if updated_user.title is not None:
         user.title = updated_user.title

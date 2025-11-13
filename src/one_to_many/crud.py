@@ -3,7 +3,7 @@ from sqlalchemy.orm import selectinload
 from uuid import UUID
 
 from src.one_to_many.models import AuthorModel, BookModel
-from src.one_to_many.schemas import AuthorCreate, AuthorRead, AuthorOut, AuthorEdit
+from src.one_to_many.schemas import AuthorCreate, AuthorEdit
 
 from sqlalchemy import select, delete
 
@@ -28,18 +28,16 @@ async def create_author_in_db(author: AuthorCreate, session: SessionDep):
 async def get_author_from_db(author_id: UUID, session: SessionDep):
     query = select(AuthorModel).where(AuthorModel.id == author_id).options(selectinload(AuthorModel.books))
     result = await session.execute(query)
+    author = result.scalars().first()
 
-    return result.scalars().first()
+    if not author:
+        raise HTTPException(status_code=404, detail="author not found")
+
+    return author
 
 
 async def edit_author_in_db(author_id: UUID, author: AuthorEdit, session: SessionDep):
-    query = select(AuthorModel).where(AuthorModel.id == author_id).options(selectinload(AuthorModel.books))
-    result = await session.execute(query)
-
-    update_author = result.scalars().first()
-
-    if not update_author:
-        raise HTTPException(status_code=404, detail="author not found")
+    update_author = await get_author_from_db(author_id, session)
 
     update_author.first_name = author.first_name
     update_author.last_name = author.last_name

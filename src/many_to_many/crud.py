@@ -43,18 +43,16 @@ async def get_actor_from_db(actor_id: UUID, session: SessionDep):
     query = select(ActorModel).where(ActorModel.id == actor_id).options(selectinload(ActorModel.theatres))
 
     result = await session.execute(query)
+    actor = result.scalars().first()
+
+    if not actor:
+        raise HTTPException(status_code=404, detail="actor not found")
+
     return result.scalars().first()
 
 
 async def update_actor_in_db(actor_id: UUID, updated_actor: ActorUpdate, session: SessionDep):
-    query = select(ActorModel).where(ActorModel.id == actor_id).options(selectinload(ActorModel.theatres))
-
-    res = await session.execute(query)
-
-    actor = res.scalars().first()
-
-    if not actor:
-        raise HTTPException(status_code=404, detail="Actor not found")
+    actor = get_actor_from_db(actor_id, session)
 
     actor.first_name = updated_actor.first_name
     actor.last_name = updated_actor.last_name
