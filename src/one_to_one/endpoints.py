@@ -5,7 +5,7 @@ from fastapi import APIRouter
 
 from src.db import SessionDep
 from src.one_to_one.crud import create_user_db, get_users_db, update_user_db, delete_user_db
-from src.one_to_one.schemas import UserCreate, UserRead, UserUpdate, UserDelete
+from src.one_to_one.schemas import UserCreate, UserRead, UserUpdate, UserDelete, UserOut
 
 router = APIRouter(tags=['Пользователи и профили'])
 
@@ -21,7 +21,7 @@ async def create_user(
 @router.get("/get_users/{user_id}")
 async def get_users(
         user_id: UUID,
-        session: SessionDep) -> UserRead:
+        session: SessionDep) -> UserOut:
     res = await get_users_db(user_id, session)
 
     return res
@@ -40,6 +40,6 @@ async def edit_user_by_id(
 
 
 @router.delete("/delete_user")
-async def delete_user(user: UUID, session: SessionDep):
+async def delete_user(user: UUID, session: SessionDep) -> Dict[str, str]:
     await delete_user_db(user, session)
     return {"status": "user deleted"}

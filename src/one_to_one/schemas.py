@@ -23,6 +23,10 @@ class ProfileRead(ProfileBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class ProfileOut(ProfileCreate):
+    id: UUID
+
+
 class ProfileUpdate(BaseModel):
     title: Optional[str]
     bio: Optional[str]
@@ -44,8 +48,10 @@ class UserCreate(UserBase):
 
 class UserRead(UserBase):
     id: UUID
-    profile: Optional[ProfileBase] = None
 
+
+class UserOut(UserBase):
+    profile: Optional[ProfileOut]
     model_config = ConfigDict(from_attributes=True)
 
 

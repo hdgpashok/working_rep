@@ -29,10 +29,6 @@ class AuthorRead(BaseModel):
 
 
 class AuthorOut(AuthorCreate):
-    # id: UUID
-    first_name: str
-    last_name: str
-
     books: Optional[list[BookOut]]
 
     model_config = ConfigDict(from_attributes=True)

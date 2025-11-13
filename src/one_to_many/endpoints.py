@@ -1,3 +1,4 @@
+from typing import Dict
 from uuid import UUID
 
 from fastapi import APIRouter
@@ -12,7 +13,7 @@ router = APIRouter(tags=['Авторы и книги'])
 
 
 @router.post("/create_author")
-async def create_author(author: AuthorCreate, session: SessionDep):
+async def create_author(author: AuthorCreate, session: SessionDep) -> Dict[str, str]:
     await create_author_in_db(author, session)
     return {'status': 'user created'}
 
@@ -25,14 +26,14 @@ async def get_author(author_id: UUID, session: SessionDep) -> AuthorOut:
 
 
 @router.patch("/edit_author/{author_id}")
-async def edit_author(author_id: UUID, author: AuthorEdit, session: SessionDep):
+async def edit_author(author_id: UUID, author: AuthorEdit, session: SessionDep) -> Dict[str, str]:
     await edit_author_in_db(author_id, author, session)
 
     return {'status': 'author edited'}
 
 
 @router.delete("/delete_author/{author_id}")
-async def delete_author(author_id: UUID, session: SessionDep):
+async def delete_author(author_id: UUID, session: SessionDep) -> Dict[str, str]:
     await delete_author_from_db(author_id, session)
 
     return {'status': 'author deleted'}

@@ -1,11 +1,20 @@
-version: '3.7'
-
 services:
-  postgres:
-    image: postgres:14
+  db:
+    image: postgres:15
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
       POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: postgres
     ports:
       - "5433:5432"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:123456@postgres:5432/app
+    ports:
+      - "8000:8000"

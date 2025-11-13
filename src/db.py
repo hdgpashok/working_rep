@@ -7,7 +7,7 @@ from src.config import Settings
 
 settings = Settings()
 
-engine = create_async_engine(str(settings.postgres_url),)
+engine = create_async_engine(str(settings.postgres_url), echo=True)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 
