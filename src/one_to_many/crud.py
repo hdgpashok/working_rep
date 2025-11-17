@@ -7,16 +7,15 @@ from src.one_to_many.schemas import AuthorCreate, AuthorEdit
 
 from sqlalchemy import select, delete
 
-from fastapi import HTTPException
+from src.exceptions.author import AuthorNotFound
 
 from src.db import SessionDep
 
 
 async def create_author_in_db(author: AuthorCreate, session: SessionDep):
     new_author = AuthorModel(
-        first_name=author.first_name,
-        last_name=author.last_name,
-        books= [BookModel(title=book.title) for book in author.books]
+        **author.model_dump(exclude={'books'}),
+        books=[BookModel(**book.model_dump()) for book in author.books]
     )
 
     session.add(new_author)
@@ -31,8 +30,7 @@ async def get_author_from_db(author_id: UUID, session: SessionDep):
     author = result.scalars().first()
 
     if not author:
-        raise HTTPException(status_code=404, detail="author not found")
-
+        raise AuthorNotFound(author_id=author_id)
     return author
 
 

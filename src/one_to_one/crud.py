@@ -1,14 +1,16 @@
 from uuid import UUID
 
+from sqlalchemy import select, delete
+
 from sqlalchemy.orm import selectinload
 
 from fastapi import HTTPException
 
 from src.db import SessionDep
 from src.one_to_one.models import UserModel, ProfileModel
-from src.one_to_one.schemas import UserCreate, UserUpdate
+from src.one_to_one.schemas import UserCreate, UserUpdate, UserOut
 
-from sqlalchemy import select, delete
+from src.exceptions.user import UserNotFound
 
 
 async def create_user_db(user: UserCreate, session: SessionDep) -> None:
@@ -32,7 +34,7 @@ async def get_users_db(user_id: UUID, session: SessionDep):
     user = result.scalars().first()
 
     if not user:
-        raise HTTPException(status_code=404, detail="user not found")
+        raise UserNotFound(user_id=user_id)
 
     return user
 

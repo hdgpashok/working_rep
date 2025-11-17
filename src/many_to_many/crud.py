@@ -2,7 +2,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import selectinload
 
-from fastapi import HTTPException
+from src.exceptions.actor import ActorNotFound
 
 from src.many_to_many.models import ActorModel, TheatreModel, ActorsAndTheatres
 
@@ -14,7 +14,7 @@ from sqlalchemy import select, delete
 
 
 async def create_actor_in_db(actor: ActorCreate, session: SessionDep):
-    new_actor = ActorModel(first_name=actor.first_name, last_name=actor.last_name)
+    new_actor = ActorModel(**actor.model_dump(exclude={'theatres'}))
     theatres = []
 
     for theatre in actor.theatres or []:
@@ -28,7 +28,7 @@ async def create_actor_in_db(actor: ActorCreate, session: SessionDep):
         if existing_theatre:
             theatres.append(existing_theatre)
         else:
-            new_theatre = TheatreModel(name=theatre.name, address=theatre.address)
+            new_theatre = TheatreModel(**theatre.model_dump())
             session.add(new_theatre)
             theatres.append(new_theatre)
 
@@ -36,7 +36,6 @@ async def create_actor_in_db(actor: ActorCreate, session: SessionDep):
     session.add(new_actor)
 
     await session.commit()
-    await session.refresh(new_actor)
 
 
 async def get_actor_from_db(actor_id: UUID, session: SessionDep):
@@ -46,7 +45,7 @@ async def get_actor_from_db(actor_id: UUID, session: SessionDep):
     actor = result.scalars().first()
 
     if not actor:
-        raise HTTPException(status_code=404, detail="actor not found")
+        raise ActorNotFound(actor_id=actor_id)
 
     return result.scalars().first()
 
