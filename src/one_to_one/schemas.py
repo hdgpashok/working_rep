@@ -51,7 +51,8 @@ class UserRead(UserBase):
 
 
 class UserOut(UserBase):
-    profile: Optional[ProfileOut]
+    id: UUID
+    profile: ProfileOut
     model_config = ConfigDict(from_attributes=True)
 
 

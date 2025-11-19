@@ -1,13 +1,16 @@
 from typing import Dict
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from src.db import SessionDep
+from src.db import get_session, SessionDep
 from src.one_to_one.crud import create_user_db, get_users_db, update_user_db, delete_user_db
 from src.one_to_one.schemas import UserCreate, UserRead, UserUpdate, UserDelete, UserOut
 
-router = APIRouter(tags=['Пользователи и профили'])
+router = APIRouter(
+    tags=['Пользователи и профили'],
+    dependencies=[Depends(get_session)]
+)
 
 
 @router.post("/create_user")

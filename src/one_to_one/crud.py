@@ -4,12 +4,9 @@ from sqlalchemy import select, delete
 
 from sqlalchemy.orm import selectinload
 
-from fastapi import HTTPException
-
 from src.db import SessionDep
 from src.one_to_one.models import UserModel, ProfileModel
-from src.one_to_one.schemas import UserCreate, UserUpdate, UserOut
-
+from src.one_to_one.schemas import UserCreate, UserUpdate
 from src.exceptions.user import UserNotFound
 
 
