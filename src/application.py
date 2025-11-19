@@ -8,6 +8,8 @@ from src.one_to_one import router as one_to_one_router
 from src.one_to_many import router as one_to_many_router
 from src.many_to_many import router as many_to_many_router
 
+from src.exceptions.handler import error_handler
+
 
 def get_app() -> FastAPI:
     """
@@ -35,5 +37,7 @@ def get_app() -> FastAPI:
     app.include_router(one_to_one_router)
     app.include_router(one_to_many_router)
     app.include_router(many_to_many_router)
+
+    error_handler(app)
 
     return app
