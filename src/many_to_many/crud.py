@@ -15,26 +15,22 @@ from sqlalchemy import select, delete
 
 async def create_actor_in_db(actor: ActorCreate, session: SessionDep):
     new_actor = ActorModel(**actor.model_dump(exclude={'theatres'}))
-    theatres = []
 
-    for theatre in actor.theatres or []:
-        result = await session.execute(
+    for theatre_data in actor.theatres or []:
+        query = (
             select(TheatreModel)
-            .where(TheatreModel.name == theatre.name)
-            .where(TheatreModel.address == theatre.address)
+            .where(TheatreModel.name == theatre_data.name)
+            .where(TheatreModel.address == theatre_data.address)
         )
-        existing_theatre = result.scalars().one_or_none()
+        result = await session.execute(query)
+        theatre = result.scalars().one_or_none()
 
-        if existing_theatre:
-            theatres.append(existing_theatre)
-        else:
-            new_theatre = TheatreModel(**theatre.model_dump())
-            session.add(new_theatre)
-            theatres.append(new_theatre)
+        if theatre is None:
+            theatre = TheatreModel(**theatre_data.model_dump())
 
-    new_actor.theatres = theatres
+        new_actor.theatres.append(theatre)
+
     session.add(new_actor)
-
     await session.commit()
 
 

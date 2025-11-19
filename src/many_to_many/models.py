@@ -19,6 +19,7 @@ class ActorModel(Base):
         "TheatreModel",
         secondary='actors_and_theatres',
         back_populates="actors",
+        cascade='save-update'
     )
 
 
