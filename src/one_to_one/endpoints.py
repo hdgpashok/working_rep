@@ -13,24 +13,24 @@ router = APIRouter(
 )
 
 
-@router.post("/create_user")
+@router.post("/users")
 async def create_user(
         user: UserCreate,
-        session: SessionDep) -> Dict[str, str]:
-    await create_user_db(user, session)
-    return {'status': 'user created'}
+        session: SessionDep) -> UserOut:
+    new_user = await create_user_db(user, session)
+    return new_user
 
 
-@router.get("/get_users/{user_id}")
+@router.get("/users/{user_id}")
 async def get_users(
         user_id: UUID,
-        session: SessionDep) -> UserOut:
+        session: SessionDep):
     res = await get_users_db(user_id, session)
 
     return res
 
 
-@router.patch("/edit_user_by_id/{user_id}")
+@router.patch("/users/{user_id}")
 async def edit_user_by_id(
         user_id: UUID,
         edited_user: UserUpdate,
@@ -42,7 +42,7 @@ async def edit_user_by_id(
         return {'error': f"{e}"}
 
 
-@router.delete("/delete_user")
-async def delete_user(user: UUID, session: SessionDep) -> Dict[str, str]:
-    await delete_user_db(user, session)
+@router.delete("/users/{user_id}")
+async def delete_user(user_id: UUID, session: SessionDep) -> Dict[str, str]:
+    await delete_user_db(user_id, session)
     return {"status": "user deleted"}
