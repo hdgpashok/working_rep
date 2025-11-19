@@ -1,15 +1,18 @@
 from typing import Dict
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from src.db import SessionDep
+from src.db import SessionDep, get_session
 
 from src.one_to_many.schemas import AuthorCreate, AuthorEdit, AuthorOut
 
 from src.one_to_many.crud import create_author_in_db, get_author_from_db, edit_author_in_db, delete_author_from_db
 
-router = APIRouter(tags=['Авторы и книги'])
+router = APIRouter(
+    tags=['Авторы и книги'],
+    dependencies=Depends[get_session]
+)
 
 
 @router.post("/create_author")

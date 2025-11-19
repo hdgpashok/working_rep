@@ -1,15 +1,18 @@
 from typing import Dict
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from src.many_to_many.crud import create_actor_in_db, get_actor_from_db, update_actor_in_db, delete_actor_from_db
 
-from src.db import SessionDep
+from src.db import SessionDep, get_session
 
 from src.many_to_many.schemas import ActorCreate, ActorUpdate, ActorOut
 
-router = APIRouter(tags=['Актеры и театры'])
+router = APIRouter(
+    tags=['Актеры и театры'],
+    dependencies=Depends[get_session]
+)
 
 
 @router.post("/create_actor")
