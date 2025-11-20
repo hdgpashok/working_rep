@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 
-@router.post("/users")
+@router.post("/users", status_code=201)
 async def create_user(
         user: UserCreate,
         session: SessionDep) -> UserOut:
@@ -21,7 +21,7 @@ async def create_user(
     return new_user
 
 
-@router.get("/users/{user_id}")
+@router.get("/users/{user_id}", status_code=200)
 async def get_users(
         user_id: UUID,
         session: SessionDep):
@@ -30,19 +30,19 @@ async def get_users(
     return res
 
 
-@router.patch("/users/{user_id}")
+@router.patch("/users/{user_id}",status_code=200)
 async def edit_user_by_id(
         user_id: UUID,
         edited_user: UserUpdate,
-        session: SessionDep) -> Dict[str, str]:
-    try:
-        await update_user_db(user_id, edited_user, session)
-        return {'status': 'user edited'}
-    except Exception as e:
-        return {'error': f"{e}"}
+        session: SessionDep) -> UserOut:
+
+    res = await update_user_db(user_id, edited_user, session)
+    return res
 
 
-@router.delete("/users/{user_id}")
-async def delete_user(user_id: UUID, session: SessionDep) -> Dict[str, str]:
-    await delete_user_db(user_id, session)
-    return {"status": "user deleted"}
+@router.delete("/users/{user_id}", status_code=204)
+async def delete_user(
+        user_id: UUID,
+        session: SessionDep):
+    res = await delete_user_db(user_id, session)
+    return res

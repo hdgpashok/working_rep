@@ -9,27 +9,26 @@ from pydantic import BaseModel, ConfigDict
 class ProfileBase(BaseModel):
     title: str
     bio: str
-    user_id: UUID
 
 
-class ProfileCreate(BaseModel):
-    title: str
-    bio: str
-
-
-class ProfileRead(ProfileBase):
+class ProfileRead(BaseModel):
     id: UUID
 
     model_config = ConfigDict(from_attributes=True)
 
 
-class ProfileOut(ProfileCreate):
+class ProfileCreate(ProfileBase):
+    pass
+
+
+class ProfileOut(ProfileBase):
     id: UUID
 
+    model_config = ConfigDict(from_attributes=True)
 
-class ProfileUpdate(BaseModel):
-    title: Optional[str]
-    bio: Optional[str]
+
+class ProfileUpdate(ProfileBase):
+    pass
 
 
 class ProfileDelete(ProfileRead):
@@ -42,23 +41,23 @@ class UserBase(BaseModel):
     title: str
 
 
+class UserRead(BaseModel):
+    id: UUID
+
+
 class UserCreate(UserBase):
     profile: ProfileCreate
 
 
-class UserRead(UserBase):
-    id: UUID
-
-
-class UserOut(UserBase):
-    id: UUID
+class UserOut(UserRead):
+    title: str
     profile: ProfileOut
+
     model_config = ConfigDict(from_attributes=True)
 
 
-class UserUpdate(BaseModel):
-    title: Optional[str] | None
-    profile: Optional[ProfileUpdate] | None
+class UserUpdate(UserBase):
+    profile: ProfileUpdate
 
 
 class UserDelete(UserRead):
