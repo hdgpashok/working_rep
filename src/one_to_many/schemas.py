@@ -23,7 +23,7 @@ class BookOut(BookBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-class BookEdit(BookBase):
+class BookUpdate(BookBase):
     pass
 
 
@@ -41,10 +41,11 @@ class AuthorCreate(AuthorBase):
 
 
 class AuthorOut(AuthorBase):
+    id: UUID
     books: list[BookOut]
 
     model_config = ConfigDict(from_attributes=True)
 
 
-class AuthorEdit(AuthorBase):
-    pass
+class AuthorUpdate(AuthorBase):
+    books: list[BookUpdate]
