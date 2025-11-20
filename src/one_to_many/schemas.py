@@ -10,7 +10,7 @@ class BookBase(BaseModel):
 
 
 class BookRead(BaseModel):
-    id: Mapped[UUID]
+    id: UUID
 
 
 class BookCreate(BookBase):
