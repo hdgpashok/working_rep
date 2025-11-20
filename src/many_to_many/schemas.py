@@ -16,6 +16,8 @@ class TheatreRead(TheatreBase):
 class TheatreOut(TheatreBase):
     id: UUID
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class TheatreCreate(TheatreBase):
     pass
@@ -35,7 +37,7 @@ class ActorBase(BaseModel):
 
 
 class ActorCreate(ActorBase):
-    theatres: Optional[list[TheatreCreate]] = None
+    theatres: list[TheatreCreate]
 
 
 class ActorRead(ActorBase):
@@ -43,11 +45,13 @@ class ActorRead(ActorBase):
 
 
 class ActorOut(ActorBase):
-    theatres: Optional[list[TheatreOut]]
+    theatres: list[TheatreOut]
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ActorUpdate(ActorBase):
-    theatres: Optional[list[TheatreCreate]] = None
+    theatres: list[TheatreCreate]
 
 
 class ActorDelete(ActorRead):

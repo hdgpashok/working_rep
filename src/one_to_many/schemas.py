@@ -1,38 +1,50 @@
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy.orm import Mapped, mapped_column
 
 
-class BookCreate(BaseModel):
+class BookBase(BaseModel):
     title: str
 
 
-class BookOut(BaseModel):
-    title: str
+class BookRead(BaseModel):
+    id: Mapped[UUID]
+
+
+class BookCreate(BookBase):
+    pass
+
+
+class BookOut(BookBase):
     id: UUID
 
-
-class BookEdit(BaseModel):
-    title: Optional[str]
+    model_config = ConfigDict(from_attributes=True)
 
 
-class AuthorCreate(BaseModel):
+class BookEdit(BookBase):
+    pass
+
+
+class AuthorBase(BaseModel):
     first_name: str
     last_name: str
-
-    books: Optional[list[BookCreate]]
 
 
 class AuthorRead(BaseModel):
     id: UUID
 
 
-class AuthorOut(AuthorCreate):
-    books: Optional[list[BookOut]]
+class AuthorCreate(AuthorBase):
+    books: list[BookCreate]
+
+
+class AuthorOut(AuthorBase):
+    books: list[BookOut]
 
     model_config = ConfigDict(from_attributes=True)
 
 
-class AuthorEdit(AuthorCreate):
+class AuthorEdit(AuthorBase):
     pass

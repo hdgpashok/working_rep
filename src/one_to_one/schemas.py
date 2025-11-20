@@ -1,5 +1,4 @@
 from uuid import UUID
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -13,8 +12,6 @@ class ProfileBase(BaseModel):
 
 class ProfileRead(BaseModel):
     id: UUID
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 class ProfileCreate(ProfileBase):
