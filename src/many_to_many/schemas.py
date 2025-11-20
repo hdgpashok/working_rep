@@ -9,8 +9,8 @@ class TheatreBase(BaseModel):
     address: str
 
 
-class TheatreRead(TheatreBase):
-    pass
+class TheatreRead(BaseModel):
+    id: UUID
 
 
 class TheatreOut(TheatreBase):
@@ -36,15 +36,16 @@ class ActorBase(BaseModel):
     last_name: str
 
 
+class ActorRead(BaseModel):
+    id: UUID
+
+
 class ActorCreate(ActorBase):
     theatres: list[TheatreCreate]
 
 
-class ActorRead(ActorBase):
-    pass
-
-
 class ActorOut(ActorBase):
+    id: UUID
     theatres: list[TheatreOut]
 
     model_config = ConfigDict(from_attributes=True)

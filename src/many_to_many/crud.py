@@ -8,12 +8,31 @@ from src.many_to_many.models import ActorModel, TheatreModel, ActorsAndTheatres
 
 from src.db import SessionDep
 
-from src.many_to_many.schemas import ActorCreate, ActorUpdate
+from src.many_to_many.schemas import ActorCreate, ActorUpdate, ActorOut
 
 from sqlalchemy import select, delete
 
 
-async def create_actor_in_db(actor: ActorCreate, session: SessionDep):
+async def get_actor_from_db(
+        actor_id: UUID,
+        session: SessionDep) -> ActorOut:
+    query = (
+        select(ActorModel)
+        .where(ActorModel.id == actor_id)
+        .options(selectinload(ActorModel.theatres))
+    )
+    result = await session.execute(query)
+    actor = result.scalars().first()
+
+    if not actor:
+        raise ActorNotFound(actor_id=actor_id)
+
+    return ActorOut.model_validate(actor)
+
+
+async def create_actor_in_db(
+        actor: ActorCreate,
+        session: SessionDep) -> ActorOut:
     new_actor = ActorModel(**actor.model_dump(exclude={'theatres'}))
 
     for theatre_data in actor.theatres or []:
@@ -32,28 +51,34 @@ async def create_actor_in_db(actor: ActorCreate, session: SessionDep):
 
     session.add(new_actor)
     await session.commit()
+    await session.refresh(new_actor)
+
+    res = await get_actor_from_db(new_actor.id, session)
+    return res
 
 
-async def get_actor_from_db(actor_id: UUID, session: SessionDep):
-    query = select(ActorModel).where(ActorModel.id == actor_id).options(selectinload(ActorModel.theatres))
+async def update_actor_in_db(
+        actor_id: UUID,
+        updated_actor: ActorUpdate,
+        session: SessionDep) -> ActorOut:
+    query = (
+        select(ActorModel)
+        .where(ActorModel.id == actor_id)
+        .options(selectinload(ActorModel.theatres))
+    )
 
-    result = await session.execute(query)
-    actor = result.scalars().first()
+    res = await session.execute(query)
 
-    if not actor:
-        raise ActorNotFound(actor_id=actor_id)
-
-    return result.scalars().first()
-
-
-async def update_actor_in_db(actor_id: UUID, updated_actor: ActorUpdate, session: SessionDep):
-    actor = get_actor_from_db(actor_id, session)
-
+    actor = res.scalars().first()
     actor.first_name = updated_actor.first_name
     actor.last_name = updated_actor.last_name
 
     if updated_actor.theatres:
         actor.theatres = [TheatreModel(name=theatre.name, address=theatre.address) for theatre in updated_actor.theatres]
+
+    await session.commit()
+    res = await get_actor_from_db(actor_id, session)
+    return res
 
 
 async def delete_actor_from_realation(actor_id: UUID, session: SessionDep):
@@ -62,8 +87,12 @@ async def delete_actor_from_realation(actor_id: UUID, session: SessionDep):
     await session.execute(query)
 
 
-async def delete_actor_from_db(actor_id: UUID, session: SessionDep):
+async def delete_actor_from_db(
+        actor_id: UUID,
+        session: SessionDep):
+    await get_actor_from_db(actor_id, session)
     await delete_actor_from_realation(actor_id, session)
     query = delete(ActorModel).where(ActorModel.id == actor_id)
-
     await session.execute(query)
+
+    return
