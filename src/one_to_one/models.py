@@ -5,7 +5,7 @@ import sqlalchemy as sa
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import DeclarativeMeta, Mapped, declarative_base, mapped_column, relationship
 
-from db import engine
+from src.db import engine
 
 metadata = sa.MetaData()
 
