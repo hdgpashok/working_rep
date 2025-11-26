@@ -19,7 +19,7 @@ class ActorModel(Base):
         "TheatreModel",
         secondary='actors_and_theatres',
         back_populates="actors",
-        cascade='save-update'
+        passive_deletes=True
     )
 
 
@@ -33,7 +33,8 @@ class TheatreModel(Base):
     actors: Mapped[list['ActorModel']] = relationship(
         'ActorModel',
         secondary="actors_and_theatres",
-        back_populates='theatres'
+        back_populates='theatres',
+        passive_deletes=True
     )
 
     __table_args__ = (
@@ -44,8 +45,15 @@ class TheatreModel(Base):
 class ActorsAndTheatres(Base):
     __tablename__ = 'actors_and_theatres'
 
-    actor_id: Mapped[uuid.UUID] = mapped_column(ForeignKey(ActorModel.id), primary_key=True)
-    theatre_id: Mapped[uuid.UUID] = mapped_column(ForeignKey(TheatreModel.id), primary_key=True)
+    actor_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey(ActorModel.id, ondelete='CASCADE'),
+        primary_key=True,
+
+    )
+    theatre_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey(TheatreModel.id, ondelete='CASCADE'),
+        primary_key=True
+    )
 
 
 if __name__ == '__main__':
