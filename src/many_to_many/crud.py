@@ -1,12 +1,11 @@
 from uuid import UUID
 
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.exceptions.actor import ActorNotFound
 
 from src.many_to_many.models import ActorModel, TheatreModel
-
-from src.db import SessionDep
 
 from src.many_to_many.schemas import ActorCreate, ActorUpdate, ActorOut
 
@@ -15,7 +14,7 @@ from sqlalchemy import select
 
 async def get_actor_from_db(
         actor_id: UUID,
-        session: SessionDep) -> ActorOut:
+        session: AsyncSession) -> ActorOut:
     query = (
         select(ActorModel)
         .where(ActorModel.id == actor_id)
@@ -32,22 +31,24 @@ async def get_actor_from_db(
 
 async def create_actor_in_db(
         actor: ActorCreate,
-        session: SessionDep) -> ActorOut:
+        session: AsyncSession) -> ActorOut:
     new_actor = ActorModel(**actor.model_dump(exclude={'theatres'}))
 
-    for theatre_data in actor.theatres:
+    new_actor.theatres = []
+    for theatre in actor.theatres:
         query = (
-            select(TheatreModel)
-            .where(TheatreModel.name == theatre_data.name)
-            .where(TheatreModel.address == theatre_data.address)
+            select(TheatreModel).filter(
+                TheatreModel.name == theatre.name,
+                TheatreModel.address == theatre.address
+            )
         )
         result = await session.execute(query)
-        theatre = result.scalars().one_or_none()
+        db_theatre = result.scalars().one_or_none()
 
-        if theatre is None:
-            theatre = TheatreModel(**theatre_data.model_dump())
+        if not db_theatre:
+            db_theatre = TheatreModel(**theatre.model_dump())
 
-        new_actor.theatres.append(theatre)
+        new_actor.theatres.append(db_theatre)
 
     session.add(new_actor)
 
@@ -60,27 +61,47 @@ async def create_actor_in_db(
 async def update_actor_in_db(
         actor_id: UUID,
         updated_actor: ActorUpdate,
-        session: SessionDep) -> ActorOut:
+        session: AsyncSession) -> ActorOut:
     query = (
         select(ActorModel)
-        .where(ActorModel.id == actor_id)
+        .filter(ActorModel.id == actor_id)
         .options(selectinload(ActorModel.theatres))
     )
 
     res = await session.execute(query)
 
-    actor = res.scalars().first()
-    actor.first_name = updated_actor.first_name
-    actor.last_name = updated_actor.last_name
+    actor = res.scalars().one_or_none()
 
-    if updated_actor.theatres:
-        actor.theatres = [TheatreModel(name=theatre.name, address=theatre.address) for theatre in updated_actor.theatres]
+    if not actor:
+        raise ActorNotFound(actor_id=actor_id)
+
+    for f_name, l_name in updated_actor.model_dump(exclude={'theatres'}, exclude_unset=True).items():
+        setattr(actor, f_name, l_name)
+
+    actor.theatres = []
+
+    for theatre in updated_actor.theatres:
+        query = (
+            select(TheatreModel).filter(
+                TheatreModel.name == theatre.name,
+                TheatreModel.address == theatre.address
+            )
+        )
+        result = await session.execute(query)
+        db_theatre = result.scalars().one_or_none()
+
+        if not db_theatre:
+            db_theatre = TheatreModel(**theatre.model_dump())
+
+        actor.theatres.append(db_theatre)
 
     res = await get_actor_from_db(actor_id, session)
     return res
 
 
-async def delete_actor_from_db(actor_id: UUID, session: SessionDep):
+async def delete_actor_from_db(
+        actor_id: UUID,
+        session: AsyncSession):
     actor = await session.get(ActorModel, actor_id)
     if not actor:
         raise ActorNotFound(actor_id=actor_id)

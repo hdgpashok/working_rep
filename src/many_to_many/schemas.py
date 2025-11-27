@@ -52,7 +52,7 @@ class ActorOut(ActorBase):
 
 
 class ActorUpdate(ActorBase):
-    theatres: list[TheatreCreate]
+    theatres: list[TheatreUpdate]
 
 
 class ActorDelete(ActorRead):
