@@ -16,7 +16,7 @@ async def get_author_from_db(
         session: AsyncSession) -> AuthorOut:
     query = (
         select(AuthorModel)
-        .where(AuthorModel.id == author_id)
+        .filter(AuthorModel.id == author_id)
         .options(selectinload(AuthorModel.books))
     )
     result = await session.execute(query)
@@ -49,7 +49,7 @@ async def edit_author_in_db(
         session: AsyncSession) -> AuthorOut:
     query = (
         select(AuthorModel)
-        .where(AuthorModel.id == author_id)
+        .filter(AuthorModel.id == author_id)
         .options(selectinload(AuthorModel.books))
     )
     res = await session.execute(query)
@@ -59,8 +59,8 @@ async def edit_author_in_db(
     if not update_author:
         raise AuthorNotFound(author_id=author_id)
 
-    update_author.first_name = author.first_name
-    update_author.last_name = author.last_name
+    for key, value in author.model_dump(exclude={'books'}, exclude_unset=True).items():
+        setattr(update_author, key, value)
 
     update_author.books = [BookModel(title=book.title) for book in author.books]
 
