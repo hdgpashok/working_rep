@@ -1,10 +1,10 @@
 from uuid import UUID
 
 from sqlalchemy import select, delete
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlalchemy.orm import selectinload
 
-from src.db import SessionDep
 from src.one_to_one.models import UserModel, ProfileModel
 from src.one_to_one.schemas import UserCreate, UserUpdate, UserOut
 from src.exceptions.user import UserNotFound
@@ -12,7 +12,7 @@ from src.exceptions.user import UserNotFound
 
 async def get_users_db(
         user_id: UUID,
-        session: SessionDep) -> UserOut:
+        session: AsyncSession) -> UserOut:
     query = (
         select(UserModel)
         .where(UserModel.id == user_id)
@@ -30,7 +30,7 @@ async def get_users_db(
 
 async def create_user_db(
         user: UserCreate,
-        session: SessionDep) -> UserOut:
+        session: AsyncSession) -> UserOut:
     new_profile = ProfileModel(
         **user.profile.model_dump()
     )
@@ -41,8 +41,7 @@ async def create_user_db(
     )
 
     session.add(new_user)
-    await session.commit()
-    await session.refresh(new_user)
+    await session.flush()
 
     res = await get_users_db(new_user.id, session)
     return res
@@ -51,7 +50,7 @@ async def create_user_db(
 async def update_user_db(
         user_id: UUID,
         updated_user: UserUpdate,
-        session: SessionDep) -> UserOut:
+        session: AsyncSession) -> UserOut:
     query = (
         select(UserModel)
         .where(UserModel.id == user_id)
@@ -59,31 +58,25 @@ async def update_user_db(
     )
     result = await session.execute(query)
 
-    user = result.scalars().first()
+    user = result.scalars().one_or_none()
+
+    if not user:
+        raise UserNotFound(user_id=user_id)
 
     user.title = updated_user.title
-    user.profile.title = updated_user.profile.title
-    user.profile.bio = updated_user.profile.bio
+    user.profile = updated_user.profile
 
-    await session.commit()
     res = await get_users_db(user_id, session)
     return res
 
 
-async def delete_profile_db(
-        user_id: UUID,
-        session: SessionDep):
-    query = delete(ProfileModel).where(ProfileModel.user_id == user_id)
-    await session.execute(query)
-
-
 async def delete_user_db(
         user_id: UUID,
-        session: SessionDep):
-    res = await get_users_db(user_id, session)
-    await delete_profile_db(user_id, session)
-    query = delete(UserModel).where(UserModel.id == user_id)
-    await session.execute(query)
+        session: AsyncSession):
+    user = await session.get(UserModel, user_id)
+    if not user:
+        raise UserNotFound(user_id=user_id  )
 
+    await session.delete(user)
     return
 
