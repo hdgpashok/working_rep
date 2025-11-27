@@ -2,6 +2,8 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
+from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT
+
 from src.many_to_many.crud import create_actor_in_db, get_actor_from_db, update_actor_in_db, delete_actor_from_db
 
 from src.db import SessionDep, get_session
@@ -15,7 +17,7 @@ router = APIRouter(
 )
 
 
-@router.post("/actors", status_code=201)
+@router.post("/actors", status_code=HTTP_201_CREATED)
 async def create_actor(
         actor: ActorCreate,
         session: SessionDep) -> ActorOut:
@@ -23,7 +25,7 @@ async def create_actor(
     return res
 
 
-@router.get("/actors/{actor_id}", status_code=200)
+@router.get("/actors/{actor_id}", status_code=HTTP_200_OK)
 async def get_actor(
         actor_id: UUID,
         session: SessionDep) -> ActorOut:
@@ -31,7 +33,7 @@ async def get_actor(
     return res
 
 
-@router.patch("/actors/{actor_id}", status_code=200)
+@router.patch("/actors/{actor_id}", status_code=HTTP_200_OK)
 async def edit_actor(
         actor_id: UUID,
         updated_actor: ActorUpdate,
@@ -40,7 +42,7 @@ async def edit_actor(
     return res
 
 
-@router.delete("/actors/{actor_id}", status_code=204)
+@router.delete("/actors/{actor_id}", status_code=HTTP_204_NO_CONTENT)
 async def delete_actor(actor_id: UUID, session: SessionDep):
     res = await delete_actor_from_db(actor_id, session)
     return res

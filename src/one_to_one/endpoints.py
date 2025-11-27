@@ -1,11 +1,12 @@
-from typing import Dict
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
+from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT
+
 from src.db import get_session, SessionDep
 from src.one_to_one.crud import create_user_db, get_users_db, update_user_db, delete_user_db
-from src.one_to_one.schemas import UserCreate, UserRead, UserUpdate, UserDelete, UserOut
+from src.one_to_one.schemas import UserCreate, UserUpdate, UserOut
 
 router = APIRouter(
     tags=['Пользователи и профили'],
@@ -13,7 +14,7 @@ router = APIRouter(
 )
 
 
-@router.post("/users", status_code=201)
+@router.post("/users", status_code=HTTP_201_CREATED)
 async def create_user(
         user: UserCreate,
         session: SessionDep) -> UserOut:
@@ -21,7 +22,7 @@ async def create_user(
     return new_user
 
 
-@router.get("/users/{user_id}", status_code=200)
+@router.get("/users/{user_id}", status_code=HTTP_200_OK)
 async def get_users(
         user_id: UUID,
         session: SessionDep):
@@ -30,7 +31,7 @@ async def get_users(
     return res
 
 
-@router.patch("/users/{user_id}",status_code=200)
+@router.patch("/users/{user_id}",status_code=HTTP_200_OK)
 async def edit_user_by_id(
         user_id: UUID,
         edited_user: UserUpdate,
@@ -40,7 +41,7 @@ async def edit_user_by_id(
     return res
 
 
-@router.delete("/users/{user_id}", status_code=204)
+@router.delete("/users/{user_id}", status_code=HTTP_204_NO_CONTENT)
 async def delete_user(
         user_id: UUID,
         session: SessionDep):

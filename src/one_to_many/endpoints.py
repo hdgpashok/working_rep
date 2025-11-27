@@ -1,9 +1,10 @@
-from typing import Dict
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
 from src.db import SessionDep, get_session
+
+from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
 from src.one_to_many.schemas import AuthorCreate, AuthorOut, AuthorUpdate
 
@@ -15,7 +16,7 @@ router = APIRouter(
 )
 
 
-@router.post("/authors", status_code=201)
+@router.post("/authors", status_code=HTTP_201_CREATED)
 async def create_author(
         author: AuthorCreate,
         session: SessionDep) -> AuthorOut:
@@ -23,7 +24,7 @@ async def create_author(
     return author
 
 
-@router.get("/authors/{author_id}", status_code=200)
+@router.get("/authors/{author_id}", status_code=HTTP_200_OK)
 async def get_author(
         author_id: UUID,
         session: SessionDep) -> AuthorOut:
@@ -31,7 +32,7 @@ async def get_author(
     return result
 
 
-@router.patch("/authors/{author_id}", status_code=200)
+@router.patch("/authors/{author_id}", status_code=HTTP_200_OK)
 async def edit_author(
         author_id: UUID,
         author: AuthorUpdate,
@@ -40,7 +41,7 @@ async def edit_author(
     return author
 
 
-@router.delete("/authors/{author_id}", status_code=204)
+@router.delete("/authors/{author_id}", status_code=HTTP_204_NO_CONTENT)
 async def delete_author(
         author_id: UUID,
         session: SessionDep):
