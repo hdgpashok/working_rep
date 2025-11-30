@@ -9,6 +9,7 @@ from src.one_to_one.crud import create_user_db, get_users_db, update_user_db, de
 from src.one_to_one.schemas import UserCreate, UserUpdate, UserOut
 
 router = APIRouter(
+    prefix="api/v1/users_and_profiles",
     tags=['Пользователи и профили'],
     dependencies=[Depends(get_session)]
 )

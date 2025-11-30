@@ -11,6 +11,7 @@ from src.one_to_many.schemas import AuthorCreate, AuthorOut, AuthorUpdate
 from src.one_to_many.crud import create_author_in_db, get_author_from_db, edit_author_in_db, delete_author_from_db
 
 router = APIRouter(
+    prefix="api/v1/authors_and_books",
     tags=['Авторы и книги'],
     dependencies=[Depends(get_session)]
 )
