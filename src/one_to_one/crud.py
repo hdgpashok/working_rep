@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 
 from src.one_to_one.models import UserModel, ProfileModel
 from src.one_to_one.schemas import UserCreate, UserUpdate, UserOut
-from src.exceptions.user import UserNotFound
+from src.exceptions.not_found import ObjectNotFound
 
 
 async def get_users_db(
@@ -23,7 +23,7 @@ async def get_users_db(
     user = result.scalars().first()
 
     if not user:
-        raise UserNotFound(user_id=user_id)
+        raise ObjectNotFound(object_id=user_id)
 
     return UserOut.model_validate(user)
 
@@ -61,7 +61,7 @@ async def update_user_db(
     user = result.scalars().one_or_none()
 
     if not user:
-        raise UserNotFound(user_id=user_id)
+        raise ObjectNotFound(object_id=user_id)
 
     user.title = updated_user.title
     user.profile = updated_user.profile
@@ -75,7 +75,7 @@ async def delete_user_db(
         session: AsyncSession):
     user = await session.get(UserModel, user_id)
     if not user:
-        raise UserNotFound(user_id=user_id  )
+        raise ObjectNotFound(object_id=user_id  )
 
     await session.delete(user)
     return

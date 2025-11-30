@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.exceptions.actor import ActorNotFound
+from src.exceptions.not_found import ObjectNotFound
 
 from src.many_to_many.models import ActorModel, TheatreModel
 
@@ -24,7 +24,7 @@ async def get_actor_from_db(
     actor = result.scalars().first()
 
     if not actor:
-        raise ActorNotFound(actor_id=actor_id)
+        raise ObjectNotFound(object_id=actor_id)
 
     return ActorOut.model_validate(actor)
 
@@ -73,7 +73,7 @@ async def update_actor_in_db(
     actor = res.scalars().one_or_none()
 
     if not actor:
-        raise ActorNotFound(actor_id=actor_id)
+        raise ObjectNotFound(object_id=actor_id)
 
     for f_name, l_name in updated_actor.model_dump(exclude={'theatres'}, exclude_unset=True).items():
         setattr(actor, f_name, l_name)
@@ -104,7 +104,7 @@ async def delete_actor_from_db(
         session: AsyncSession):
     actor = await session.get(ActorModel, actor_id)
     if not actor:
-        raise ActorNotFound(actor_id=actor_id)
+        raise ObjectNotFound(object_id=actor_id)
 
     await session.delete(actor)
     return

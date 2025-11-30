@@ -8,7 +8,7 @@ from src.one_to_many.schemas import AuthorCreate, AuthorUpdate, AuthorOut
 
 from sqlalchemy import select
 
-from src.exceptions.author import AuthorNotFound
+from src.exceptions.not_found import ObjectNotFound
 
 
 async def get_author_from_db(
@@ -23,7 +23,7 @@ async def get_author_from_db(
     author = result.scalars().first()
 
     if not author:
-        raise AuthorNotFound(author_id=author_id)
+        raise ObjectNotFound(object_id=author_id)
 
     return AuthorOut.model_validate(author)
 
@@ -57,7 +57,7 @@ async def edit_author_in_db(
     update_author = res.scalars().one_or_none()
 
     if not update_author:
-        raise AuthorNotFound(author_id=author_id)
+        raise ObjectNotFound(object_id=author_id)
 
     for key, value in author.model_dump(exclude={'books'}, exclude_unset=True).items():
         setattr(update_author, key, value)
@@ -73,7 +73,7 @@ async def delete_author_from_db(
         session: AsyncSession):
     author = await session.get(AuthorModel, author_id)
     if not author:
-        raise AuthorNotFound(author_id=author_id)
+        raise ObjectNotFound(object_id=author_id)
 
     await session.delete(author)
     return
