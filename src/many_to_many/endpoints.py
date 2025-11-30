@@ -12,6 +12,7 @@ from src.many_to_many.schemas import ActorCreate, ActorUpdate, ActorOut
 
 
 router = APIRouter(
+    prefix='api/v1/actors_and_theatres',
     tags=['Актеры и театры'],
     dependencies=[Depends(get_session)]
 )
