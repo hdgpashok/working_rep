@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import UJSONResponse
 from src.exceptions.base import AppException
 
 
@@ -9,7 +9,7 @@ def error_handler(app: FastAPI):
     async def app_exceptions_handler(req: Request, exc: AppException):
         body = {'detail': exc.message}
 
-        return JSONResponse(
+        return UJSONResponse(
             status_code=exc.status_code,
             content=body
         )
