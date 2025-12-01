@@ -33,7 +33,6 @@ async def create_author_in_db(author: AuthorCreate, session: AsyncSession) -> Au
     )
 
     session.add(new_author)
-    await session.flush()
 
     res = await get_author_from_db(new_author.id, session)
     return res

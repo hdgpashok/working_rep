@@ -48,8 +48,6 @@ async def create_actor_in_db(actor: ActorCreate, session: AsyncSession) -> Actor
 
     session.add(new_actor)
 
-    await session.flush()
-
     res = await get_actor_from_db(new_actor.id, session)
     return res
 

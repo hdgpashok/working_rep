@@ -37,7 +37,6 @@ async def create_user_db(user: UserCreate, session: AsyncSession) -> UserOut:
     )
 
     session.add(new_user)
-    await session.flush()
 
     res = await get_users_db(new_user.id, session)
     return res
