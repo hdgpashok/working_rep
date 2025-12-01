@@ -11,9 +11,7 @@ from sqlalchemy import select
 from src.exceptions.not_found import ObjectNotFound
 
 
-async def get_author_from_db(
-        author_id: UUID,
-        session: AsyncSession) -> AuthorOut:
+async def get_author_from_db(author_id: UUID, session: AsyncSession) -> AuthorOut:
     query = (
         select(AuthorModel)
         .filter(AuthorModel.id == author_id)
@@ -28,9 +26,7 @@ async def get_author_from_db(
     return AuthorOut.model_validate(author)
 
 
-async def create_author_in_db(
-        author: AuthorCreate,
-        session: AsyncSession) -> AuthorOut:
+async def create_author_in_db(author: AuthorCreate, session: AsyncSession) -> AuthorOut:
     new_author = AuthorModel(
         **author.model_dump(exclude={'books'}),
         books=[BookModel(**book.model_dump()) for book in author.books]
@@ -43,10 +39,7 @@ async def create_author_in_db(
     return res
 
 
-async def edit_author_in_db(
-        author_id: UUID,
-        author: AuthorUpdate,
-        session: AsyncSession) -> AuthorOut:
+async def edit_author_in_db(author_id: UUID, author: AuthorUpdate, session: AsyncSession) -> AuthorOut:
     query = (
         select(AuthorModel)
         .filter(AuthorModel.id == author_id)
@@ -68,9 +61,7 @@ async def edit_author_in_db(
     return res
 
 
-async def delete_author_from_db(
-        author_id: UUID,
-        session: AsyncSession):
+async def delete_author_from_db(author_id: UUID, session: AsyncSession):
     author = await session.get(AuthorModel, author_id)
     if not author:
         raise ObjectNotFound(object_id=author_id)

@@ -12,9 +12,7 @@ from src.many_to_many.schemas import ActorCreate, ActorUpdate, ActorOut
 from sqlalchemy import select
 
 
-async def get_actor_from_db(
-        actor_id: UUID,
-        session: AsyncSession) -> ActorOut:
+async def get_actor_from_db(actor_id: UUID, session: AsyncSession) -> ActorOut:
     query = (
         select(ActorModel)
         .where(ActorModel.id == actor_id)
@@ -29,9 +27,7 @@ async def get_actor_from_db(
     return ActorOut.model_validate(actor)
 
 
-async def create_actor_in_db(
-        actor: ActorCreate,
-        session: AsyncSession) -> ActorOut:
+async def create_actor_in_db(actor: ActorCreate, session: AsyncSession) -> ActorOut:
     new_actor = ActorModel(**actor.model_dump(exclude={'theatres'}))
 
     new_actor.theatres = []
@@ -58,10 +54,7 @@ async def create_actor_in_db(
     return res
 
 
-async def update_actor_in_db(
-        actor_id: UUID,
-        updated_actor: ActorUpdate,
-        session: AsyncSession) -> ActorOut:
+async def update_actor_in_db(actor_id: UUID, updated_actor: ActorUpdate, session: AsyncSession) -> ActorOut:
     query = (
         select(ActorModel)
         .filter(ActorModel.id == actor_id)
@@ -99,9 +92,7 @@ async def update_actor_in_db(
     return res
 
 
-async def delete_actor_from_db(
-        actor_id: UUID,
-        session: AsyncSession):
+async def delete_actor_from_db(actor_id: UUID, session: AsyncSession):
     actor = await session.get(ActorModel, actor_id)
     if not actor:
         raise ObjectNotFound(object_id=actor_id)

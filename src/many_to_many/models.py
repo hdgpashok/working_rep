@@ -1,11 +1,10 @@
-import asyncio
 import uuid
 
 from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
-from src.one_to_one.models import create_database_tables, Base
+from src.one_to_one.models import Base
 
 
 class ActorModel(Base):
@@ -54,7 +53,3 @@ class ActorsAndTheatres(Base):
         ForeignKey(TheatreModel.id, ondelete='CASCADE'),
         primary_key=True
     )
-
-
-if __name__ == '__main__':
-    asyncio.run(create_database_tables())

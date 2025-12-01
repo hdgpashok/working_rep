@@ -10,9 +10,7 @@ from src.one_to_one.schemas import UserCreate, UserUpdate, UserOut
 from src.exceptions.not_found import ObjectNotFound
 
 
-async def get_users_db(
-        user_id: UUID,
-        session: AsyncSession) -> UserOut:
+async def get_users_db(user_id: UUID, session: AsyncSession) -> UserOut:
     query = (
         select(UserModel)
         .where(UserModel.id == user_id)
@@ -28,9 +26,7 @@ async def get_users_db(
     return UserOut.model_validate(user)
 
 
-async def create_user_db(
-        user: UserCreate,
-        session: AsyncSession) -> UserOut:
+async def create_user_db(user: UserCreate, session: AsyncSession) -> UserOut:
     new_profile = ProfileModel(
         **user.profile.model_dump()
     )
@@ -47,10 +43,7 @@ async def create_user_db(
     return res
 
 
-async def update_user_db(
-        user_id: UUID,
-        updated_user: UserUpdate,
-        session: AsyncSession) -> UserOut:
+async def update_user_db(user_id: UUID, updated_user: UserUpdate, session: AsyncSession) -> UserOut:
     query = (
         select(UserModel)
         .where(UserModel.id == user_id)
@@ -70,9 +63,7 @@ async def update_user_db(
     return res
 
 
-async def delete_user_db(
-        user_id: UUID,
-        session: AsyncSession):
+async def delete_user_db(user_id: UUID, session: AsyncSession):
     user = await session.get(UserModel, user_id)
     if not user:
         raise ObjectNotFound(object_id=user_id  )
