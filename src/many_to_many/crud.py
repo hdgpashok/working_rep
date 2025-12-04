@@ -38,8 +38,7 @@ async def create_actor_in_db(actor: ActorCreate, session: AsyncSession) -> Actor
     for theatre in actor.theatres:
         query = (
             select(TheatreModel).filter(
-                TheatreModel.name == theatre.name,
-                TheatreModel.address == theatre.address
+                theatre.name == TheatreModel.name,
             )
         )
         result = await session.execute(query)
