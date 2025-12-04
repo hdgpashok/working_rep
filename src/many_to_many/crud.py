@@ -5,8 +5,8 @@ from sqlalchemy.orm import selectinload
 
 from src.exceptions.not_found import ObjectNotFound
 
-from src.many_to_many.models import ActorModel, TheatreModel
-
+from src.many_to_many.models.actors import ActorModel
+from src.many_to_many.models.theatres import TheatreModel
 from src.many_to_many.schemas import ActorCreate, ActorUpdate, ActorOut
 
 from sqlalchemy import select

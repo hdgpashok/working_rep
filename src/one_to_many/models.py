@@ -2,7 +2,7 @@ import asyncio
 import uuid
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, declarative_base, DeclarativeMeta
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 import sqlalchemy as sa
 

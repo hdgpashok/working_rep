@@ -7,7 +7,9 @@ from alembic import context
 
 from src.one_to_one.models import Base, UserModel, ProfileModel
 from src.one_to_many.models import AuthorModel, BookModel
-from src.many_to_many.models import ActorModel, TheatreModel, ActorsAndTheatres
+from src.many_to_many.models.actors import ActorModel
+from src.many_to_many.models.theatres import TheatreModel
+from src.many_to_many.models.actors_and_theatres import ActorsAndTheatres
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
