@@ -1,3 +1,4 @@
+import uuid
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,7 +29,10 @@ async def get_actor_from_db(actor_id: UUID, session: AsyncSession) -> ActorOut:
 
 
 async def create_actor_in_db(actor: ActorCreate, session: AsyncSession) -> ActorOut:
-    new_actor = ActorModel(**actor.model_dump(exclude={'theatres'}))
+    new_actor = ActorModel(
+        id=uuid.uuid4(),
+        **actor.model_dump(exclude={'theatres'})
+    )
 
     new_actor.theatres = []
     for theatre in actor.theatres:
@@ -47,6 +51,7 @@ async def create_actor_in_db(actor: ActorCreate, session: AsyncSession) -> Actor
         new_actor.theatres.append(db_theatre)
 
     session.add(new_actor)
+    print(new_actor.id)
 
     res = await get_actor_from_db(new_actor.id, session)
     return res

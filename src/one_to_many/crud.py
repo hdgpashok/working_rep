@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -28,6 +30,7 @@ async def get_author_from_db(author_id: UUID, session: AsyncSession) -> AuthorOu
 
 async def create_author_in_db(author: AuthorCreate, session: AsyncSession) -> AuthorOut:
     new_author = AuthorModel(
+        id=uuid.uuid4(),
         **author.model_dump(exclude={'books'}),
         books=[BookModel(**book.model_dump()) for book in author.books]
     )

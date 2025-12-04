@@ -1,3 +1,4 @@
+import uuid
 from uuid import UUID
 
 from sqlalchemy import select, delete
@@ -31,6 +32,7 @@ async def create_user_db(user: UserCreate, session: AsyncSession) -> UserOut:
         **user.profile.model_dump()
     )
     new_user = UserModel(
+        id=uuid.uuid4(),
         title=user.title,
 
         profile=new_profile
