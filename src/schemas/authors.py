@@ -1,30 +1,8 @@
-from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy.orm import Mapped, mapped_column
+from pydantic import BaseModel, ConfigDict
 
-
-class BookBase(BaseModel):
-    title: str
-
-
-class BookRead(BaseModel):
-    id: UUID
-
-
-class BookCreate(BookBase):
-    pass
-
-
-class BookOut(BookBase):
-    id: UUID
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class BookUpdate(BookBase):
-    pass
+from src.schemas.books import BookCreate, BookOut, BookUpdate
 
 
 class AuthorBase(BaseModel):

@@ -6,9 +6,10 @@ from src.db import SessionDep, get_session
 
 from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
-from src.one_to_many.schemas import AuthorCreate, AuthorOut, AuthorUpdate
+from src.schemas.authors import AuthorCreate, AuthorOut, AuthorUpdate
 
-from src.one_to_many.crud import create_author_in_db, get_author_from_db, edit_author_in_db, delete_author_from_db
+from src.services.authors import AuthorRepository
+
 
 router = APIRouter(
     prefix="/api/v1/authors_books",
@@ -19,20 +20,19 @@ router = APIRouter(
 
 @router.post("/authors", status_code=HTTP_201_CREATED)
 async def create_author(author: AuthorCreate, session: SessionDep) -> AuthorOut:
-    return await create_author_in_db(author, session)
+    return await AuthorRepository.create_author_in_db(author, session)
 
 
 @router.get("/authors/{author_id}", status_code=HTTP_200_OK)
 async def get_author(author_id: UUID, session: SessionDep) -> AuthorOut:
-    return await get_author_from_db(author_id, session)
+    return await AuthorRepository.get_author_from_db(author_id, session)
 
 
 @router.patch("/authors/{author_id}", status_code=HTTP_200_OK)
 async def edit_author(author_id: UUID, author: AuthorUpdate, session: SessionDep) -> AuthorOut:
-    return await edit_author_in_db(author_id, author, session)
+    return await AuthorRepository.edit_author_in_db(author_id, author, session)
 
 
 @router.delete("/authors/{author_id}", status_code=HTTP_204_NO_CONTENT)
 async def delete_author(author_id: UUID, session: SessionDep):
-    res = await delete_author_from_db(author_id, session)
-    return res
+    return await AuthorRepository.delete_author_from_db(author_id, session)

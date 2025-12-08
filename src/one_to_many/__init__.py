@@ -1,1 +1,0 @@
-from src.one_to_many.endpoints import router

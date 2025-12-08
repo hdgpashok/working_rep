@@ -4,7 +4,6 @@ import sqlalchemy as sa
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.models.authors import AuthorModel
 from src.models.base import Base
 
 
