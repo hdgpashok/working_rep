@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 from src.models.users import UserModel
 from src.models.profiles import ProfileModel
 
-from src.exceptions.not_found import ObjectNotFound
+from src.core.exceptions.not_found import ObjectNotFound
 
 from src.schemas.users import UserOut, UserCreate, UserUpdate
 

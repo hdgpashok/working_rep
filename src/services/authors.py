@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.exceptions.not_found import ObjectNotFound
+from src.core.exceptions.not_found import ObjectNotFound
 
 from src.models.books import BookModel
 from src.models.authors import AuthorModel
