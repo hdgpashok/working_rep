@@ -3,8 +3,8 @@ import uuid
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.many_to_many.models.actors_and_theatres import ActorsAndTheatres
-from src.one_to_one.models import Base
+from models.actors_and_theatres import ActorsAndTheatres
+from src.models.base import Base
 
 
 class TheatreModel(Base):

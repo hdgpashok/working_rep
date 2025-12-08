@@ -2,9 +2,9 @@ import uuid
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.many_to_many.models.actors_and_theatres import ActorsAndTheatres
-from src.many_to_many.models.theatres import TheatreModel
-from src.one_to_one.models import Base
+from models.actors_and_theatres import ActorsAndTheatres
+from models.theatres import TheatreModel
+from src.models.base import Base
 
 
 class ActorModel(Base):

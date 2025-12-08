@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.one_to_one.models import Base
+from src.models.base import Base
 
 
 class ActorsAndTheatres(Base):
