@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from models.actors_and_theatres import ActorsAndTheatres
+from src.models.actors_and_theatres import ActorsAndTheatres
 from src.models.base import Base
 
 

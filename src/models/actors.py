@@ -2,8 +2,8 @@ import uuid
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from models.actors_and_theatres import ActorsAndTheatres
-from models.theatres import TheatreModel
+from src.models.actors_and_theatres import ActorsAndTheatres
+from src.models.theatres import TheatreModel
 from src.models.base import Base
 
 
