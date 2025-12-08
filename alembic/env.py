@@ -11,7 +11,7 @@ from src.many_to_many.models.actors import ActorModel
 from src.many_to_many.models.theatres import TheatreModel
 from src.many_to_many.models.actors_and_theatres import ActorsAndTheatres
 
-# this is the Alembic Config object, which provides
+# this is the Alembic Config object , which provides
 # access to the values within the .ini file in use.
 config = context.config
 

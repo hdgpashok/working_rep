@@ -50,10 +50,8 @@ async def create_actor_in_db(actor: ActorCreate, session: AsyncSession) -> Actor
         new_actor.theatres.append(db_theatre)
 
     session.add(new_actor)
-    print(new_actor.id)
 
-    res = await get_actor_from_db(new_actor.id, session)
-    return res
+    return await get_actor_from_db(new_actor.id, session)
 
 
 async def update_actor_in_db(actor_id: UUID, updated_actor: ActorUpdate, session: AsyncSession) -> ActorOut:
@@ -90,8 +88,7 @@ async def update_actor_in_db(actor_id: UUID, updated_actor: ActorUpdate, session
 
         actor.theatres.append(db_theatre)
 
-    res = await get_actor_from_db(actor_id, session)
-    return res
+    return await get_actor_from_db(actor_id, session)
 
 
 async def delete_actor_from_db(actor_id: UUID, session: AsyncSession):

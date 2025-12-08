@@ -11,7 +11,7 @@ from src.one_to_many.schemas import AuthorCreate, AuthorOut, AuthorUpdate
 from src.one_to_many.crud import create_author_in_db, get_author_from_db, edit_author_in_db, delete_author_from_db
 
 router = APIRouter(
-    prefix="/api/v1/authors_and_books",
+    prefix="/api/v1/authors_books",
     tags=['Авторы и книги'],
     dependencies=[Depends(get_session)]
 )
@@ -19,20 +19,17 @@ router = APIRouter(
 
 @router.post("/authors", status_code=HTTP_201_CREATED)
 async def create_author(author: AuthorCreate, session: SessionDep) -> AuthorOut:
-    author = await create_author_in_db(author, session)
-    return author
+    return await create_author_in_db(author, session)
 
 
 @router.get("/authors/{author_id}", status_code=HTTP_200_OK)
 async def get_author(author_id: UUID, session: SessionDep) -> AuthorOut:
-    result = await get_author_from_db(author_id, session)
-    return result
+    return await get_author_from_db(author_id, session)
 
 
 @router.patch("/authors/{author_id}", status_code=HTTP_200_OK)
 async def edit_author(author_id: UUID, author: AuthorUpdate, session: SessionDep) -> AuthorOut:
-    author = await edit_author_in_db(author_id, author, session)
-    return author
+    return await edit_author_in_db(author_id, author, session)
 
 
 @router.delete("/authors/{author_id}", status_code=HTTP_204_NO_CONTENT)

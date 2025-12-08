@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 import sqlalchemy as sa
 
-from src.one_to_one.models import create_database_tables, Base
+from src.one_to_one.models import Base
 
 
 class AuthorModel(Base):
@@ -32,7 +32,3 @@ class BookModel(Base):
     author_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("authors.id"))
 
     author: Mapped["AuthorModel"] = relationship("AuthorModel", back_populates="books")
-
-
-if __name__ == '__main__':
-    asyncio.run(create_database_tables())

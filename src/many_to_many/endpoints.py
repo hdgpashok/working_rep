@@ -12,7 +12,7 @@ from src.many_to_many.schemas import ActorCreate, ActorUpdate, ActorOut
 
 
 router = APIRouter(
-    prefix='/api/v1/actors_and_theatres',
+    prefix='/api/v1/actors_theatres',
     tags=['Актеры и театры'],
     dependencies=[Depends(get_session)]
 )
@@ -20,23 +20,19 @@ router = APIRouter(
 
 @router.post("/actors", status_code=HTTP_201_CREATED)
 async def create_actor(actor: ActorCreate, session: SessionDep) -> ActorOut:
-    res = await create_actor_in_db(actor, session)
-    return res
+    return await create_actor_in_db(actor, session)
 
 
 @router.get("/actors/{actor_id}", status_code=HTTP_200_OK)
 async def get_actor(actor_id: UUID, session: SessionDep) -> ActorOut:
-    res = await get_actor_from_db(actor_id, session)
-    return res
+    return await get_actor_from_db(actor_id, session)
 
 
 @router.patch("/actors/{actor_id}", status_code=HTTP_200_OK)
 async def edit_actor(actor_id: UUID, updated_actor: ActorUpdate, session: SessionDep) -> ActorOut:
-    res = await update_actor_in_db(actor_id, updated_actor, session)
-    return res
+    return await update_actor_in_db(actor_id, updated_actor, session)
 
 
 @router.delete("/actors/{actor_id}", status_code=HTTP_204_NO_CONTENT)
 async def delete_actor(actor_id: UUID, session: SessionDep):
-    res = await delete_actor_from_db(actor_id, session)
-    return res
+    return await delete_actor_from_db(actor_id, session)

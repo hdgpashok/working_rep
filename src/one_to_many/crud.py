@@ -37,8 +37,7 @@ async def create_author_in_db(author: AuthorCreate, session: AsyncSession) -> Au
 
     session.add(new_author)
 
-    res = await get_author_from_db(new_author.id, session)
-    return res
+    return await get_author_from_db(new_author.id, session)
 
 
 async def edit_author_in_db(author_id: UUID, author: AuthorUpdate, session: AsyncSession) -> AuthorOut:
@@ -59,8 +58,7 @@ async def edit_author_in_db(author_id: UUID, author: AuthorUpdate, session: Asyn
 
     update_author.books = [BookModel(title=book.title) for book in author.books]
 
-    res = await get_author_from_db(author_id, session)
-    return res
+    return await get_author_from_db(author_id, session)
 
 
 async def delete_author_from_db(author_id: UUID, session: AsyncSession):

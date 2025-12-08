@@ -40,8 +40,7 @@ async def create_user_db(user: UserCreate, session: AsyncSession) -> UserOut:
 
     session.add(new_user)
 
-    res = await get_users_db(new_user.id, session)
-    return res
+    return await get_users_db(new_user.id, session)
 
 
 async def update_user_db(user_id: UUID, updated_user: UserUpdate, session: AsyncSession) -> UserOut:
@@ -60,8 +59,7 @@ async def update_user_db(user_id: UUID, updated_user: UserUpdate, session: Async
     user.title = updated_user.title
     user.profile = updated_user.profile
 
-    res = await get_users_db(user_id, session)
-    return res
+    return await get_users_db(user_id, session)
 
 
 async def delete_user_db(user_id: UUID, session: AsyncSession):

@@ -45,15 +45,3 @@ class ProfileModel(Base):
 
     user: Mapped["UserModel"] = relationship('UserModel', back_populates='profile')
 
-
-async def create_database_tables():
-    try:
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-        print("success init")
-    except Exception as e:
-        print(f"error: {e}")
-
-
-if __name__ == "__main__":
-    asyncio.run(create_database_tables())
