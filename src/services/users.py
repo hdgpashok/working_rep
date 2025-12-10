@@ -13,7 +13,7 @@ from src.exceptions.not_found import ObjectNotFound
 from src.schemas.users import UserOut, UserCreate, UserUpdate
 
 
-class UserRepository:
+class UserService:
     @staticmethod
     async def get_users_with_profile(user_id: UUID, session: AsyncSession) -> UserOut:
         query = (
@@ -43,7 +43,7 @@ class UserRepository:
 
         session.add(new_user)
 
-        return await UserRepository.get_users_with_profile(new_user.id, session)
+        return await UserService.get_users_with_profile(new_user.id, session)
 
     @staticmethod
     async def update_user_db(user_id: UUID, updated_user: UserUpdate, session: AsyncSession) -> UserOut:
@@ -62,7 +62,7 @@ class UserRepository:
         user.title = updated_user.title
         user.profile = updated_user.profile
 
-        return await UserRepository.get_users_with_profile(user_id, session)
+        return await UserService.get_users_with_profile(user_id, session)
 
     @staticmethod
     async def delete_user_db(user_id: UUID, session: AsyncSession):

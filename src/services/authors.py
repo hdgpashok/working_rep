@@ -13,7 +13,7 @@ from src.models.authors import AuthorModel
 from src.schemas.authors import AuthorOut, AuthorCreate, AuthorUpdate
 
 
-class AuthorRepository:
+class AuthorService:
     @staticmethod
     async def get_author_from_db(author_id: UUID, session: AsyncSession) -> AuthorOut:
         query = (
@@ -27,7 +27,7 @@ class AuthorRepository:
         if not author:
             raise ObjectNotFound(object_id=author_id)
 
-        return AuthorOut.model_validate(author)
+        return AuthorService.model_validate(author)
 
     @staticmethod
     async def create_author_in_db(author: AuthorCreate, session: AsyncSession) -> AuthorOut:
@@ -39,7 +39,7 @@ class AuthorRepository:
 
         session.add(new_author)
 
-        return await AuthorRepository.get_author_from_db(new_author.id, session)
+        return await AuthorService.get_author_from_db(new_author.id, session)
 
     @staticmethod
     async def edit_author_in_db(author_id: UUID, author: AuthorUpdate, session: AsyncSession) -> AuthorOut:
@@ -60,7 +60,7 @@ class AuthorRepository:
 
         update_author.books = [BookModel(title=book.title) for book in author.books]
 
-        return await AuthorRepository.get_author_from_db(author_id, session)
+        return await AuthorService.get_author_from_db(author_id, session)
 
     @staticmethod
     async def delete_author_from_db(author_id: UUID, session: AsyncSession):

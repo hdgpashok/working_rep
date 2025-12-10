@@ -12,7 +12,7 @@ from src.exceptions.not_found import ObjectNotFound
 from src.schemas.actors import ActorOut, ActorCreate, ActorUpdate
 
 
-class ActorRepository:
+class ActorService:
     @staticmethod
     async def get_actor_from_db(actor_id: UUID, session: AsyncSession) -> ActorOut:
         query = (
@@ -52,7 +52,7 @@ class ActorRepository:
 
         session.add(new_actor)
 
-        return await ActorRepository.get_actor_from_db(new_actor.id, session)
+        return await ActorService.get_actor_from_db(new_actor.id, session)
 
     @staticmethod
     async def update_actor_in_db(actor_id: UUID, updated_actor: ActorUpdate, session: AsyncSession) -> ActorOut:
@@ -89,7 +89,7 @@ class ActorRepository:
 
             actor.theatres.append(db_theatre)
 
-        return await ActorRepository.get_actor_from_db(actor_id, session)
+        return await ActorService.get_actor_from_db(actor_id, session)
 
     @staticmethod
     async def delete_actor_from_db(actor_id: UUID, session: AsyncSession):
