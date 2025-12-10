@@ -2,7 +2,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
-from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT
+from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
 from src.db import get_session, SessionDep
 from src.schemas.users import UserCreate, UserUpdate, UserOut
@@ -22,12 +22,12 @@ async def create_user(user: UserCreate, session: SessionDep) -> UserOut:
     return await UserRepository.create_user_db(user, session)
 
 
-@router.get("/users/{user_id}", status_code=HTTP_200_OK)
+@router.get("/users/{user_id}")
 async def get_users(user_id: UUID, session: SessionDep) -> UserOut:
     return await UserRepository.get_users_with_profile(user_id, session)
 
 
-@router.patch("/users/{user_id}",status_code=HTTP_200_OK)
+@router.patch("/users/{user_id}")
 async def edit_user_by_id(user_id: UUID, edited_user: UserUpdate, session: SessionDep) -> UserOut:
     return await UserRepository.update_user_db(user_id, edited_user, session)
 

@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 from src.models.theatres import TheatreModel
 from src.models.actors import ActorModel
 
-from src.core.exceptions.not_found import ObjectNotFound
+from src.exceptions.not_found import ObjectNotFound
 from src.schemas.actors import ActorOut, ActorCreate, ActorUpdate
 
 

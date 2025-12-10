@@ -2,7 +2,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
-from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT
+from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
 from src.services.actors import ActorRepository
 from src.db import SessionDep, get_session
@@ -22,12 +22,12 @@ async def create_actor(actor: ActorCreate, session: SessionDep) -> ActorOut:
     return await ActorRepository.create_actor_in_db(actor, session)
 
 
-@router.get("/actors/{actor_id}", status_code=HTTP_200_OK)
+@router.get("/actors/{actor_id}")
 async def get_actor(actor_id: UUID, session: SessionDep) -> ActorOut:
     return await ActorRepository.get_actor_from_db(actor_id, session)
 
 
-@router.patch("/actors/{actor_id}", status_code=HTTP_200_OK)
+@router.patch("/actors/{actor_id}")
 async def edit_actor(actor_id: UUID, updated_actor: ActorUpdate, session: SessionDep) -> ActorOut:
     return await ActorRepository.update_actor_in_db(actor_id, updated_actor, session)
 

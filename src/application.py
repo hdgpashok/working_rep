@@ -8,7 +8,7 @@ from src.routes.users import router as one_to_one_router
 from src.routes.authors import router as one_to_many_router
 from src.routes.actors import router as many_to_many_router
 
-from src.core.exceptions.handler import error_handler
+from exceptions.handler import error_handler
 
 
 def get_app() -> FastAPI:
