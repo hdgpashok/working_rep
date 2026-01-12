@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
 from src.db import get_session, SessionDep
-from src.schemas.users import UserCreate, UserUpdate, UserOut
+from src.schemas.users import UserCreate, UserUpdate, UserOut, UserExternal
 
 from src.services.users import UserService
 
@@ -35,3 +35,8 @@ async def edit_user_by_id(user_id: UUID, edited_user: UserUpdate, session: Sessi
 @router.delete("/users/{user_id}", status_code=HTTP_204_NO_CONTENT)
 async def delete_user(user_id: UUID, session: SessionDep):
     return await UserService.delete_user_db(user_id, session)
+
+
+@router.post("/external_user")
+async def create_internal(user: UserExternal, session: SessionDep) -> UserOut:
+    return await UserService.create_external_user(user, session)

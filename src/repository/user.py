@@ -11,7 +11,7 @@ from src.models.profiles import ProfileModel
 
 from src.exceptions.not_found import ObjectNotFound
 
-from src.schemas.users import UserOut, UserCreate, UserUpdate
+from src.schemas.users import UserOut, UserCreate, UserUpdate, UserExternal
 
 from src.core.redis_cache import rd, expire_time
 
@@ -95,3 +95,17 @@ class UserRepository:
 
         await session.delete(user)
         return {'info': 'user deleted'}
+
+    @staticmethod
+    async def create_external_user(user: UserExternal, session: AsyncSession) -> UserOut:
+        new_profile = ProfileModel(**user.profile.model_dump())
+
+        new_user = UserModel(profile=new_profile)
+        user_data = user.model_dump(exclude={'profile'})
+
+        for key, value in user_data.items():
+            setattr(new_user, key, value)
+
+        session.add(new_user)
+
+        return UserOut.model_validate(new_user)
