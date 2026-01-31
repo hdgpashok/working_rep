@@ -94,7 +94,7 @@ class UserRepository:
             raise ObjectNotFound(object_id=user_id)
 
         await session.delete(user)
-        return {'info': 'user deleted'}
+        return
 
     @staticmethod
     async def create_external_user(user: UserExternal, session: AsyncSession) -> UserOut:
