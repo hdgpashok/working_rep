@@ -38,24 +38,6 @@ class UserRepository:
         return user
 
     @staticmethod
-    async def get_users_with_profile(user_id: UUID, session: AsyncSession) -> UserOut:
-        key = f'user:{user_id}'
-        cache = await rd.get(key)
-
-        if cache:
-            user_repo_logger.info(f'user {user_id} found in cache')
-            user = json.loads(cache)
-            return UserOut.model_validate(user)
-
-        user_repo_logger.info(f'cant find in cache')
-
-        user = await UserRepository.select(user_id, session)
-
-        await rd.set(key, UserOut.model_validate(user).model_dump_json(), ex=expire_time)
-        user_repo_logger.info(f'user:{user_id} cached')
-        return UserOut.model_validate(user)
-
-    @staticmethod
     async def create_user_db(user: UserCreate, session: AsyncSession) -> UserOut:
         new_profile = ProfileModel(
             **user.profile.model_dump()
