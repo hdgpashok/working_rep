@@ -2,6 +2,7 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.retry import retry
 from src.exceptions.not_found import ObjectNotFound
 from src.exceptions.server_error import ServerError
 from src.schemas.users import UserOut, UserCreate, UserUpdate, UserExternal
@@ -19,6 +20,7 @@ class UserService:
         self.cache = cache
 
     @staticmethod
+    @retry()
     async def create_user_db(user: UserCreate, session: AsyncSession) -> UserOut:
         logger.info(f'[CREATE USER] Start')
 
@@ -31,6 +33,7 @@ class UserService:
             raise ServerError("Failed to create user in database") from exc
 
     @staticmethod
+    @retry()
     async def update_user_db(user_id: uuid.UUID, updated_user: UserUpdate, session: AsyncSession) -> UserOut:
         logger.info(f'[UPDATE USER] Start user_id={user_id}')
 
@@ -43,6 +46,7 @@ class UserService:
             raise ServerError(f"Failed to update user {user_id}") from exc
 
     @staticmethod
+    @retry()
     async def delete_user_db(user_id: uuid.UUID, session: AsyncSession):
         logger.info(f'[DELETE USER] Start user_id={user_id}')
 
@@ -66,6 +70,7 @@ class UserService:
             logger.error(f'[CREATE EXTERNAL USER] DB error user_id={user.id} error={repr(exc)}')
             raise ServerError("Failed to create external user") from exc
 
+    @retry()
     async def get_users_with_profile(self, user_id: uuid.UUID, session: AsyncSession) -> UserOut:
         key = f'user:{user_id}'
 
