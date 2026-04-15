@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
 from src.services.actors import ActorService
-from src.db import SessionDep, get_session
+from src.db import SessionDep, get_db_session
 
 from src.schemas.actors import ActorCreate, ActorUpdate, ActorOut
 
@@ -13,7 +13,7 @@ from src.schemas.actors import ActorCreate, ActorUpdate, ActorOut
 router = APIRouter(
     prefix='/api/v1/actors_theatres',
     tags=['Актеры и театры'],
-    dependencies=[Depends(get_session)]
+    dependencies=[Depends(get_db_session)]
 )
 
 

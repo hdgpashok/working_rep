@@ -2,7 +2,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
-from src.db import SessionDep, get_session
+from src.db import SessionDep, get_db_session
 
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
@@ -14,7 +14,7 @@ from src.services.authors import AuthorService
 router = APIRouter(
     prefix="/api/v1/authors_books",
     tags=['Авторы и книги'],
-    dependencies=[Depends(get_session)]
+    dependencies=[Depends(get_db_session)]
 )
 
 

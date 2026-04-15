@@ -11,7 +11,7 @@ engine = create_async_engine(str(settings.postgres_url), echo=False)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 
-async def get_session() -> AsyncSession:
+async def get_db_session() -> AsyncSession:
     async with async_session_maker() as session:
         try:
             yield session
@@ -22,6 +22,6 @@ async def get_session() -> AsyncSession:
         finally:
             await session.close()
 
-SessionDep = Annotated[AsyncSession, Depends(get_session)]
+SessionDep = Annotated[AsyncSession, Depends(get_db_session)]
 
 
