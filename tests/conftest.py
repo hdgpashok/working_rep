@@ -1,14 +1,16 @@
 import uuid
+
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
+from unittest.mock import AsyncMock
 
 from testcontainers.postgres import PostgresContainer
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from fastapi.testclient import TestClient
-
-from src.db import get_session
+from src.services.users import UserService
+from src.core.redis_cache import CacheService
+from src.core.dependencies import get_session, get_user_service
 from src.application import get_app
 from src.schemas.profiles import ProfileCreate
 from src.schemas.users import UserCreate, UserOut
@@ -52,55 +54,66 @@ async def mock_session(mock_async_engine):
 
 
 @pytest.fixture
-def mock_id():
-    return uuid.UUID("12345678-1234-5678-1234-567812345678")
-
-
-@pytest.fixture
-def mock_create_profile(mock_id):
+def mock_create_profile():
     return ProfileCreate(
-        id=mock_id,
-        title='test',
-        bio='test_bio'
+        nickname="test",
+        title="test",
+        bio="test",
     )
 
 
 @pytest.fixture
-def mock_create_user(mock_id, mock_create_profile):
+def mock_create_user(mock_create_profile):
     return UserCreate(
-        id=mock_id,
+        first_name="test",
+        last_name="test",
         title="test",
         profile=mock_create_profile
     )
 
 
 @pytest_asyncio.fixture
-async def mock_client(mock_session):
+async def mock_user_service(mock_create_user):
+    """Мок UserService"""
+    service = AsyncMock()
+    service.create_user_db = AsyncMock()
+    service.get_users_with_profile = AsyncMock(return_value=mock_create_user)
+    service.update_user_db = AsyncMock()
+    service.delete_user_db = AsyncMock()
+    service.create_external_user = AsyncMock()
+    return service
+
+
+@pytest_asyncio.fixture
+async def mock_cache():
+    """Мок для CacheService"""
+    cache = AsyncMock(spec=CacheService)
+    cache.get = AsyncMock(return_value=None)      # по умолчанию ничего не найдено в кэше
+    cache.set = AsyncMock(return_value=True)      # успешно записываем
+    cache.delete = AsyncMock(return_value=True)
+    return cache
+
+
+@pytest_asyncio.fixture
+async def mock_client(mock_session, mock_cache):
+    """Тестовый клиент с кэшем"""
     app.dependency_overrides[get_session] = lambda: mock_session
+    # Если у тебя UserService зависит от CacheService через get_user_service:
+    app.dependency_overrides[get_user_service] = lambda: UserService(cache=mock_cache)
+
     async with AsyncClient(
-        transport=ASGITransport(app=app),
-        base_url="http://test/api/v1/users_profiles",
+            transport=ASGITransport(app=app),
+            base_url="http://test/api/v1/users_profiles",
     ) as cli:
         yield cli
 
     app.dependency_overrides.clear()
 
 
+# ==================== Данные ====================
+
 @pytest.fixture
-def mock_user_service():
-    class MockService:
-        async def create_user_db(self, data: UserCreate):
-            return UserOut(
-                id=mock_id(),
-                title=data.title,
-                profile=data.profile
-            )
+def mock_id():
+    return uuid.UUID("12345678-1234-5678-1234-567812345678")
 
-        async def get_users_with_profile(self, user_id: uuid.UUID):
-            return UserOut(
-                id=user_id,
-                title="test",
-                profile=mock_create_profile()
-            )
 
-    return MockService()
