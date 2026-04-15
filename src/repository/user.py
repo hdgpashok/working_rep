@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.models.users import UserModel
-from src.models.profiles import ProfileModel
 
 from src.exceptions.not_found import ObjectNotFound
 

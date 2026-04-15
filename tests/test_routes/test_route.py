@@ -1,10 +1,9 @@
 import pytest
-from src.schemas.users import UserOut   # ← добавляем импорт
+from src.schemas.users import UserOut
 
 
 @pytest.mark.asyncio
 async def test_route_create_user(mock_client, mock_create_user, mock_user_service):
-    # Настраиваем мок для create_user_db
     mock_user_service.create_user_db.return_value = UserOut(
         id="123e4567-e89b-12d3-a456-426614174000",
         title="string",
@@ -41,7 +40,6 @@ async def test_route_create_user(mock_client, mock_create_user, mock_user_servic
 
 @pytest.mark.asyncio
 async def test_route_get_user(mock_client, mock_id, mock_user_service):
-    # Настраиваем мок для get_users_with_profile
     mock_user_service.get_users_with_profile.return_value = UserOut(
         id=mock_id,
         title="string",
@@ -52,7 +50,6 @@ async def test_route_get_user(mock_client, mock_id, mock_user_service):
         }
     )
 
-    # Настраиваем мок для create_user_db (чтобы POST прошёл)
     mock_user_service.create_user_db.return_value = UserOut(
         id=mock_id,
         title="string",

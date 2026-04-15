@@ -13,7 +13,7 @@ from src.core.redis_cache import CacheService
 from src.core.dependencies import get_session, get_user_service
 from src.application import get_app
 from src.schemas.profiles import ProfileCreate
-from src.schemas.users import UserCreate, UserOut
+from src.schemas.users import UserCreate
 from src.models.base import Base
 
 
@@ -54,6 +54,11 @@ async def mock_session(mock_async_engine):
 
 
 @pytest.fixture
+def mock_id():
+    return uuid.UUID("12345678-1234-5678-1234-567812345678")
+
+
+@pytest.fixture
 def mock_create_profile():
     return ProfileCreate(
         nickname="test",
@@ -74,7 +79,6 @@ def mock_create_user(mock_create_profile):
 
 @pytest_asyncio.fixture
 async def mock_user_service(mock_create_user):
-    """Мок UserService"""
     service = AsyncMock()
     service.create_user_db = AsyncMock()
     service.get_users_with_profile = AsyncMock(return_value=mock_create_user)
@@ -86,19 +90,16 @@ async def mock_user_service(mock_create_user):
 
 @pytest_asyncio.fixture
 async def mock_cache():
-    """Мок для CacheService"""
     cache = AsyncMock(spec=CacheService)
-    cache.get = AsyncMock(return_value=None)      # по умолчанию ничего не найдено в кэше
-    cache.set = AsyncMock(return_value=True)      # успешно записываем
+    cache.get = AsyncMock(return_value=None)
+    cache.set = AsyncMock(return_value=True)
     cache.delete = AsyncMock(return_value=True)
     return cache
 
 
 @pytest_asyncio.fixture
 async def mock_client(mock_session, mock_cache):
-    """Тестовый клиент с кэшем"""
     app.dependency_overrides[get_session] = lambda: mock_session
-    # Если у тебя UserService зависит от CacheService через get_user_service:
     app.dependency_overrides[get_user_service] = lambda: UserService(cache=mock_cache)
 
     async with AsyncClient(
@@ -108,12 +109,5 @@ async def mock_client(mock_session, mock_cache):
         yield cli
 
     app.dependency_overrides.clear()
-
-
-# ==================== Данные ====================
-
-@pytest.fixture
-def mock_id():
-    return uuid.UUID("12345678-1234-5678-1234-567812345678")
 
 

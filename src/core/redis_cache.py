@@ -11,8 +11,6 @@ settings = Settings()
 
 
 class CacheService:
-    """Сервис для работы с Redis как с кэшем."""
-
     def __init__(self, redis_client: Redis):
         self.redis = redis_client
 
@@ -41,5 +39,4 @@ class CacheService:
             await self.redis.set(key, serialized, ex=expire)
             return True
         except (RedisError, TypeError) as exc:
-            print(f"[Cache] Set failed for key {key}: {exc}")   # временно для отладки
             return False
