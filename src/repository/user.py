@@ -1,5 +1,3 @@
-import json
-import uuid
 from uuid import UUID
 
 from sqlalchemy import select
@@ -13,9 +11,9 @@ from src.exceptions.not_found import ObjectNotFound
 
 from src.schemas.users import UserOut, UserCreate, UserUpdate, UserExternal
 
-from src.core.redis_cache import rd, expire_time
-
 from src.core.logger import get_logger
+
+from src.mapping import DataMapping
 
 
 user_repo_logger = get_logger('user_repo')
@@ -39,16 +37,7 @@ class UserRepository:
 
     @staticmethod
     async def create_user_db(user: UserCreate, session: AsyncSession) -> UserOut:
-        new_profile = ProfileModel(
-            **user.profile.model_dump()
-        )
-        new_user = UserModel(
-            id=uuid.uuid4(),
-            title=user.title,
-
-            profile=new_profile
-        )
-
+        new_user = DataMapping.map_create_data(user)
         session.add(new_user)
 
         db_user = await UserRepository.select(new_user.id, session)
@@ -58,13 +47,7 @@ class UserRepository:
     async def update_user_db(user_id: UUID, updated_user: UserUpdate, session: AsyncSession) -> UserOut:
         user = await UserRepository.select(user_id, session)
 
-        data = updated_user.model_dump(exclude={'profile'})
-        for key, value in data.items():
-            setattr(user, key, value)
-
-        profile_data = updated_user.profile.model_dump()
-        for key, value in profile_data.items():
-            setattr(user.profile, key, value)
+        DataMapping.map_update_user(user, updated_user)
 
         user = await UserRepository.select(user_id, session)
         return UserOut.model_validate(user)
@@ -80,13 +63,7 @@ class UserRepository:
 
     @staticmethod
     async def create_external_user(user: UserExternal, session: AsyncSession) -> UserOut:
-        new_profile = ProfileModel(**user.profile.model_dump())
-
-        new_user = UserModel(profile=new_profile)
-        user_data = user.model_dump(exclude={'profile'})
-
-        for key, value in user_data.items():
-            setattr(new_user, key, value)
+        new_user = DataMapping.map_external_user(user)
 
         session.add(new_user)
 
