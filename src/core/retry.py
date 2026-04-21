@@ -14,9 +14,7 @@ settings = Settings()
 RETRY_STATUSES = [500, 502, 503, 504, 429]
 
 
-def retry(max_retries: int | None = None):
-    if max_retries is None:
-        max_retries = settings.MAX_RETRIES
+def retry(max_retries: int | None = 3):
 
     def decorator(func: Callable):
         @wraps(func)
