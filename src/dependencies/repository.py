@@ -6,7 +6,7 @@ from src.repository.user import UserRepository
 
 
 async def get_repo():
-    return UserRepository
+    return UserRepository()
 
 
 RepositoryDep = Annotated[UserRepository, Depends(get_repo)]

@@ -6,57 +6,21 @@ from sqlalchemy.orm import selectinload
 
 from src.models.users import UserModel
 
-from src.schemas.users import UserOut, UserCreate, UserUpdate, UserExternal
-
-from src.core.logger import get_logger
-
-from src.mapping import DataMapping
-
-
-user_repo_logger = get_logger('user_repo')
-
 
 class UserRepository:
-    @staticmethod
-    async def select(user_id: UUID, session: AsyncSession):
+    async def select(self, user_id: UUID, session: AsyncSession) -> UserModel | None:
         query = (
             select(UserModel)
-            .where(user_id == UserModel.id)
+            .where(UserModel.id ==  user_id)
             .options(selectinload(UserModel.profile))
         )
-        result = await session.execute(query)
-        user = result.scalars().first()
 
+        result = await session.execute(query)
+        return result.scalars().first()
+
+    async def create(self, user: UserModel, session: AsyncSession) -> UserModel:
+        session.add(user)
         return user
 
-    @staticmethod
-    async def create_user_db(user: UserCreate, session: AsyncSession) -> UserOut:
-        new_user = DataMapping.map_create_data(user)
-        session.add(new_user)
-
-        db_user = await UserRepository.select(new_user.id, session)
-        return UserOut.model_validate(db_user)
-
-    @staticmethod
-    async def update_user_db(user_id: UUID, updated_user: UserUpdate, session: AsyncSession) -> UserOut:
-        user = await UserRepository.select(user_id, session)
-
-        DataMapping.map_update_user(user, updated_user)
-
-        user = await UserRepository.select(user_id, session)
-        return UserOut.model_validate(user)
-
-    @staticmethod
-    async def delete_user_db(user_id: UUID, session: AsyncSession):
-        user = await session.get(UserModel, user_id)
-
+    async def delete(self, user: UserModel, session: AsyncSession) -> None:
         await session.delete(user)
-        return
-
-    @staticmethod
-    async def create_external_user(user: UserExternal, session: AsyncSession) -> UserOut:
-        new_user = DataMapping.map_external_user(user)
-
-        session.add(new_user)
-
-        return UserOut.model_validate(new_user)
