@@ -6,8 +6,6 @@ from sqlalchemy.orm import selectinload
 
 from src.models.users import UserModel
 
-from src.exceptions.not_found import ObjectNotFound
-
 from src.schemas.users import UserOut, UserCreate, UserUpdate, UserExternal
 
 from src.core.logger import get_logger
@@ -28,9 +26,6 @@ class UserRepository:
         )
         result = await session.execute(query)
         user = result.scalars().first()
-
-        if not user:
-            raise ObjectNotFound(object_id=user_id)
 
         return user
 
@@ -54,8 +49,6 @@ class UserRepository:
     @staticmethod
     async def delete_user_db(user_id: UUID, session: AsyncSession):
         user = await session.get(UserModel, user_id)
-        if not user:
-            raise ObjectNotFound(object_id=user_id)
 
         await session.delete(user)
         return

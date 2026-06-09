@@ -27,6 +27,8 @@ class UserOut(UserRead):
 class UserUpdate(UserBase):
     profile: ProfileUpdate
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class UserDelete(UserRead):
     pass

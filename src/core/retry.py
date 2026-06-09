@@ -34,7 +34,7 @@ def retry(max_retries: int | None = 3):
                     await timeout_with_jitter(attempt)
 
             logger.error(f"[RETRY] All {max_retries} attempts failed")
-            raise ServerTimeoutError()
+            raise ServerTimeoutError(message='server timeout')
 
         return wrapper
 
