@@ -13,8 +13,8 @@ from src.schemas.users import (
     UserExternal
 )
 
-from src.core.logger import get_logger
-from src.core.redis_cache import CacheService
+from src.utils.logger import get_logger
+from redis_cache import CacheService
 from src.mapping import DataMapping
 
 

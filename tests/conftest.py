@@ -9,7 +9,7 @@ from testcontainers.postgres import PostgresContainer
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from src.services.users import UserService
-from src.core.redis_cache import CacheService
+from redis_cache import CacheService
 from src.core.dependencies import get_session, get_user_service
 from src.application import get_app
 from src.schemas.profiles import ProfileCreate

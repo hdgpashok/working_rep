@@ -1,17 +1,34 @@
 from functools import wraps
 from typing import Callable
 
-from src.core.logger import get_logger
-from src.core.timeout import timeout_with_jitter
+from src.utils.logger import get_logger
+from src.utils.timeout import timeout_with_jitter
 from src.exceptions.timeout_error import ServerTimeoutError
+
+from src.utils.config import settings
+
+from starlette.status import (
+    HTTP_500_INTERNAL_SERVER_ERROR,
+    HTTP_502_BAD_GATEWAY,
+    HTTP_503_SERVICE_UNAVAILABLE,
+    HTTP_504_GATEWAY_TIMEOUT,
+    HTTP_429_TOO_MANY_REQUESTS
+)
 
 
 logger = get_logger('retry_logger')
 
-RETRY_STATUSES = [500, 502, 503, 504, 429]
+
+RETRY_STATUSES = [
+    HTTP_500_INTERNAL_SERVER_ERROR,
+    HTTP_502_BAD_GATEWAY,
+    HTTP_503_SERVICE_UNAVAILABLE,
+    HTTP_504_GATEWAY_TIMEOUT,
+    HTTP_429_TOO_MANY_REQUESTS
+]
 
 
-def retry(max_retries: int | None = 3):
+def retry(max_retries: int = settings.MAX_RETIES):
 
     def decorator(func: Callable):
         @wraps(func)
