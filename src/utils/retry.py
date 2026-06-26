@@ -1,15 +1,12 @@
 from functools import wraps
 from typing import Callable
 
-
-from src.core.config import Settings
 from src.core.logger import get_logger
 from src.core.timeout import timeout_with_jitter
 from src.exceptions.timeout_error import ServerTimeoutError
 
 
 logger = get_logger('retry_logger')
-settings = Settings()
 
 RETRY_STATUSES = [500, 502, 503, 504, 429]
 

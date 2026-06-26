@@ -1,11 +1,7 @@
-from src.core.config import Settings
 
 import random
 
 import asyncio
-
-
-settings = Settings()
 
 
 async def timeout_with_jitter(attempt: int):
