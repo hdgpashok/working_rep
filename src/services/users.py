@@ -2,9 +2,9 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.exceptions.validation_error import ValidationError
 from src.repository.user import UserRepository
 from src.exceptions.not_found import ObjectNotFound
-from src.exceptions.server_error import ServerError
 
 from src.schemas.users import (
     UserOut,
@@ -28,25 +28,17 @@ class UserService:
         self.repo = UserRepository()
 
     async def create_user_db(self, user: UserCreate, session: AsyncSession) -> UserOut:
-
         logger.info('[CREATE USER] Start')
 
-        try:
-            db_user = DataMapping.map_create_data(user)
+        db_user = DataMapping.map_create_data(user)
 
-            db_user = await self.repo.create(db_user, session)
+        db_user = await self.repo.create(db_user, session)
 
-            # db_user = await self.repo.select(db_user.id, session)
+        result = UserOut.model_validate(db_user)
 
-            result = UserOut.model_validate(db_user)
+        logger.info('[CREATE USER] Success')
 
-            logger.info('[CREATE USER] Success')
-
-            return result
-
-        except Exception as exc:
-            logger.error(f'[CREATE USER] DB error error={repr(exc)}')
-            raise ServerError('Failed to create user in database') from exc
+        return result
 
     async def update_user_db(self, user_id: uuid.UUID, updated_user: UserUpdate, session: AsyncSession) -> UserOut:
 
@@ -57,7 +49,12 @@ class UserService:
         if not user:
             raise ObjectNotFound(object_id=str(user_id))
 
-        DataMapping.map_update_user(user, updated_user)
+        try:
+            DataMapping.map_update_user(user, updated_user)
+
+        except Exception as exc:
+            logger.info(f'[UPDATE USER] Data validation error')
+            raise ValidationError() from exc
 
         result = UserOut.model_validate(user)
 
@@ -84,7 +81,11 @@ class UserService:
 
         logger.info(f'[CREATE EXTERNAL USER] Start user_id={user.id}')
 
-        db_user = DataMapping.map_external_user(user)
+        try:
+            db_user = DataMapping.map_external_user(user)
+        except Exception as exc:
+            logger.info(f'[CREATE EXTERNAL USER] Data validation error')
+            raise ValidationError() from exc
 
         await self.repo.create(db_user, session)
 
