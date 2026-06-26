@@ -9,6 +9,7 @@ class DataMapping:
     @staticmethod
     def map_create_data(user: UserCreate):
         new_profile = ProfileModel(
+            id=uuid.uuid4(),
             **user.profile.model_dump()
         )
         return UserModel(

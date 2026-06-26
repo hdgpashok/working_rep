@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.dependencies.repository import RepositoryDep
+from src.repository.user import UserRepository
 from src.exceptions.not_found import ObjectNotFound
 from src.exceptions.server_error import ServerError
 
@@ -23,9 +23,9 @@ logger = get_logger('service_logger')
 
 class UserService:
 
-    def __init__(self, cache: CacheService, repo: RepositoryDep):
+    def __init__(self, cache: CacheService):
         self.cache = cache
-        self.repo = repo
+        self.repo = UserRepository()
 
     async def create_user_db(self, user: UserCreate, session: AsyncSession) -> UserOut:
 
@@ -34,9 +34,9 @@ class UserService:
         try:
             db_user = DataMapping.map_create_data(user)
 
-            await self.repo.create(db_user, session)
+            db_user = await self.repo.create(db_user, session)
 
-            db_user = await self.repo.select(db_user.id, session)
+            # db_user = await self.repo.select(db_user.id, session)
 
             result = UserOut.model_validate(db_user)
 

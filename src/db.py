@@ -8,19 +8,3 @@ from src.utils.config import settings
 
 engine = create_async_engine(str(settings.postgres_url), echo=False)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
-
-
-async def get_db_session() -> AsyncSession:
-    async with async_session_maker() as session:
-        try:
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
-        finally:
-            await session.close()
-
-SessionDep = Annotated[AsyncSession, Depends(get_db_session)]
-
-

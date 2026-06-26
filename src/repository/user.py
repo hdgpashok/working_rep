@@ -24,3 +24,4 @@ class UserRepository:
 
     async def delete(self, user: UserModel, session: AsyncSession) -> None:
         await session.delete(user)
+

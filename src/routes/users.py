@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
-from src.dependencies.session import get_session, SessionDep
+from src.session import get_session, SessionDep
 from src.dependencies.user_service import get_user_service, UserServiceDep
 from src.schemas.users import UserCreate, UserUpdate, UserOut, UserExternal
 
