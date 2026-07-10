@@ -1,11 +1,12 @@
-from exceptions.base import AppException
-from sqlalchemy import UUID
+from starlette.status import HTTP_404_NOT_FOUND
+from src.exceptions.base import AppException
 
 
 class ObjectNotFound(AppException):
-    def __init__(self, object_id: UUID):
-        super().__init__(
-            message=f'Object with {object_id} not found',
-            status_code=404
-        )
 
+    def __init__(self, object_id: str | None = None):
+        message = f"Object with id={object_id} not found" if object_id else "Object not found"
+        super().__init__(
+            message=message,
+            status_code=HTTP_404_NOT_FOUND
+        )

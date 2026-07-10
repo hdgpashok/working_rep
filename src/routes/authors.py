@@ -2,7 +2,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
-from src.db import SessionDep, get_session
+from src.session import get_session, SessionDep
 
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 

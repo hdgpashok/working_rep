@@ -28,3 +28,9 @@ class ProfileUpdate(ProfileBase):
 
 class ProfileDelete(ProfileRead):
     pass
+
+
+class ProfileExternal(ProfileCreate):
+    id: UUID
+
+    model_config = ConfigDict(from_attributes=True)
