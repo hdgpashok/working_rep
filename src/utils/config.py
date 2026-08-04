@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     KAFKA_PORT: int = Field(env="KAFKA_PORT")
     KAFKA_TOPIC: str = Field(env="KAFKA_TOPIC")
 
+    KAFKA_DQL_TOPIC: str = Field(env="KAFKA_DLQ_TOPIC")
+
     MAX_RETRIES: int = Field(env='MAX_RETRIES')
 
     class Config:
