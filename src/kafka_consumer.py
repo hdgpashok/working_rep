@@ -10,25 +10,32 @@ def deserializer(message):
     return json.loads(message)
 
 
-async def event_handler(value):
-    print(f"temperature {value['temp']}, weather {value['weather']}")
+class Consumer:
+    def __init__(self):
+        self.consumer = AIOKafkaConsumer
 
+    async def start(self):
+        self.consumer = AIOKafkaConsumer(
+            settings.KAFKA_TOPIC,
+            bootstrap_servers=f'{settings.KAFKA_HOST}:{settings.KAFKA_PORT}',
+            value_deserializer=deserializer,
+            group_id='user-group',
+            enable_auto_commit=False,
+            auto_offset_reset='earliest',
+        )
+        await self.consumer.start()
 
-async def consume():
-    consumer = AIOKafkaConsumer(
-        settings.KAFKA_TOPIC,
-        bootstrap_servers=f'{settings.KAFKA_HOST}:{settings.KAFKA_PORT}',
-        value_deserializer=deserializer,
+    async def stop(self):
+        if self.consumer:
+            await self.consumer.stop()
+        return
 
-    )
-    await consumer.start()
+    async def commit(self):
+        if self.consumer:
+            await self.consumer.commit()
+        return
 
-    try:
-        async for msg in consumer:
-            await event_handler(msg.value)
-    finally:
-        await consumer.stop()
-
-
-if __name__ == '__main__':
-    asyncio.run(consume())
+    def __aiter__(self):
+        if self.consumer is None:
+            raise RuntimeError("Consumer is not started")
+        return self.consumer.__aiter__()
