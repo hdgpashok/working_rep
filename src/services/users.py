@@ -120,10 +120,3 @@ class UserService:
         logger.info(f'[GET USER] Success user_id={user_id}')
 
         return result
-
-    async def create_user_from_message(self, payload: dict, session: AsyncSession):
-        try:
-            user = UserExternal.model_validate(payload)
-        except Exception as exc:
-            raise ValidationError() from exc
-        return await self.create_external_user(user, session)

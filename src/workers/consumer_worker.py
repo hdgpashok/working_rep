@@ -59,13 +59,14 @@ class ConsumerWorker:
                             payload=msg.value,
                             error=str(e),
                         )
+                        await self.consumer.commit()
                         logger.info(f"[ConsumerWorker] sent to DLQ offset={msg.offset}")
+
                     except Exception as dlq_error:
                         logger.exception(
                             f"[ConsumerWorker] DLQ send failed offset={msg.offset}: {dlq_error}"
                         )
 
-                    await self.consumer.commit()
                     logger.info(f"[ConsumerWorker] committed after error offset={msg.offset}")
 
         finally:
