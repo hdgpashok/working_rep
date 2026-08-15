@@ -1,6 +1,6 @@
 import asyncio
 
-from src.services.users import UserService
+from src.services.authors import AuthorService
 from src.kafka_consumer import Consumer
 from src.kafka_dlq_publisher import DlqPublisher
 from src.db import async_session_maker
@@ -13,7 +13,7 @@ class ConsumerWorker:
     def __init__(self) -> None:
         self.consumer = Consumer()
         self.dlq = DlqPublisher()
-        self.service = UserService()
+        self.service = AuthorService()
 
     async def start(self) -> None:
         await self.consumer.start()
@@ -27,7 +27,7 @@ class ConsumerWorker:
 
     async def process_message(self, payload: dict) -> None:
         async with async_session_maker() as session:
-            await self.service.create_user_from_message(payload, session)
+            await self.service.create_author_from_message(payload, session)
             await session.commit()
 
     async def run(self) -> None:
