@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     KAFKA_TOPIC: str = Field(env="KAFKA_TOPIC")
 
     KAFKA_DLQ_TOPIC: str = Field(env="KAFKA_DLQ_TOPIC")
+    BASE_KAFKA_DELAY: int = Field(env="BASE_KAFKA_DELAY")
 
     MAX_RETRIES: int = Field(env='MAX_RETRIES')
 
