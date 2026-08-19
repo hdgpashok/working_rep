@@ -2,7 +2,7 @@ import json
 
 from aiokafka import AIOKafkaConsumer
 
-from src.utils.config import settings
+from config.config import settings
 
 
 def deserializer(message):
@@ -18,7 +18,7 @@ class Consumer:
             settings.KAFKA_TOPIC,
             bootstrap_servers=f'{settings.KAFKA_HOST}:{settings.KAFKA_PORT}',
             value_deserializer=deserializer,
-            group_id='author-group',
+            group_id=settings.KAFKA_GROUP_ID,
             enable_auto_commit=False,
             auto_offset_reset='earliest',
         )

@@ -13,7 +13,7 @@ from src.models.base import Base
 from src.session import get_session
 from src.dependencies.user_service import get_user_service
 from src.services.users import UserService
-from src.redis_cache import CacheService
+from config.redis_cache import CacheService
 from src.schemas.profiles import ProfileCreate
 from src.schemas.users import UserCreate
 

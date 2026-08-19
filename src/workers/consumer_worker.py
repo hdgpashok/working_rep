@@ -1,11 +1,16 @@
 import asyncio
 
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+
+from src.models.processed_event import ProcessedEvent
 from src.services.authors import AuthorService
-from src.kafka_consumer import Consumer
-from src.kafka_dlq_publisher import DlqPublisher
+from src.config.kafka_consumer import Consumer
+from src.config.kafka_dlq_publisher import DlqPublisher
 from src.db import async_session_maker
 from src.utils.logger import get_logger
-from src.utils.config import settings
+from src.utils.timeout import kafka_timeout
+from src.config.config import settings
 
 
 logger = get_logger("consumer_worker")
@@ -34,10 +39,20 @@ class ConsumerWorker:
         await self.dlq.stop()
         logger.info("[ConsumerWorker] stopped")
 
+    async def _is_event_processed(self, event_id: str, session: AsyncSession) -> bool:
+        result = await session.execute(
+            select(ProcessedEvent.event_id).where(ProcessedEvent.event_id == event_id)
+        )
+        return result.scalar_one_or_none() is not None
+
     async def _process_once(self, payload: dict) -> None:
         async with self.session_maker() as session:
-            await self.service.create_author_from_message(payload, session)
-            await session.commit()
+            if not await self._is_event_processed(payload.get('id'), session):
+                await self.service.create_author_from_message(payload, session)
+                logger.info(
+                    f'[ConsumerWorker] success created author'
+                )
+                await session.commit()
 
     async def _process_with_retry(self, msg) -> bool:
         """True — можно коммитить оффсет (успех или DLQ прошёл)."""
@@ -53,11 +68,11 @@ class ConsumerWorker:
             except Exception as e:
                 last_error = e
                 logger.warning(
-                    f"[ConsumerWorker] attempt {attempt + 1}/{settings.MAX_RETRIES + 1} "
+                    f"[ConsumerWorker] attempt {attempt}/{settings.MAX_RETRIES} "
                     f"failed offset={msg.offset}: {e}"
                 )
-                if attempt < settings.MAX_RETRIES:
-                    await asyncio.sleep(settings.BASE_KAFKA_DELAY * attempt)
+                if attempt + 1 != settings.MAX_RETRIES:
+                    await kafka_timeout(attempt)
 
         logger.exception(
             f"[ConsumerWorker] retries exhausted offset={msg.offset}: {last_error}"

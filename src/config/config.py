@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     KAFKA_HOST: str = Field(env="KAFKA_HOST")
     KAFKA_PORT: int = Field(env="KAFKA_PORT")
     KAFKA_TOPIC: str = Field(env="KAFKA_TOPIC")
+    KAFKA_GROUP_ID: str = Field(env="KAFKA_GROUP_ID")
 
     KAFKA_DLQ_TOPIC: str = Field(env="KAFKA_DLQ_TOPIC")
     BASE_KAFKA_DELAY: int = Field(env="BASE_KAFKA_DELAY")

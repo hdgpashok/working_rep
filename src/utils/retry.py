@@ -5,7 +5,7 @@ from src.utils.logger import get_logger
 from src.utils.timeout import timeout_with_jitter
 from src.exceptions.timeout_error import ServerTimeoutError
 
-from src.utils.config import settings
+from config.config import settings
 
 from starlette.status import (
     HTTP_500_INTERNAL_SERVER_ERROR,

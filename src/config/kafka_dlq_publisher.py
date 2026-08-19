@@ -3,7 +3,7 @@ import json
 
 from aiokafka import AIOKafkaProducer
 
-from src.utils.config import settings
+from config.config import settings
 from src.utils.logger import get_logger
 
 logger = get_logger("dlq_publisher")

@@ -14,8 +14,8 @@ from src.schemas.users import (
 )
 
 from src.utils.logger import get_logger
-from src.redis_cache import CacheService
-from src.mapping import DataMapping
+from config.redis_cache import CacheService
+from src.mapping.mapping import DataMapping
 
 
 logger = get_logger('service_logger')
