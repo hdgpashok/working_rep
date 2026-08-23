@@ -1,12 +1,7 @@
-import json
 
-from aiokafka import AIOKafkaConsumer
+from aiokafka import AIOKafkaConsumer, TopicPartition
 
 from config.config import settings
-
-
-def deserializer(message):
-    return json.loads(message)
 
 
 class Consumer:
@@ -17,7 +12,6 @@ class Consumer:
         self.consumer = AIOKafkaConsumer(
             settings.KAFKA_TOPIC,
             bootstrap_servers=f'{settings.KAFKA_HOST}:{settings.KAFKA_PORT}',
-            value_deserializer=deserializer,
             group_id=settings.KAFKA_GROUP_ID,
             enable_auto_commit=False,
             auto_offset_reset='earliest',
@@ -32,6 +26,12 @@ class Consumer:
     async def commit(self):
         if self.consumer:
             await self.consumer.commit()
+        return
+
+    async def commit_offset(self, topic: str, partition: int, offset: int) -> None:
+        if self.consumer:
+            tp = TopicPartition(topic, partition)
+            await self.consumer.commit({tp: offset + 1})
         return
 
     def __aiter__(self):

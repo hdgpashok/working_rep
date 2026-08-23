@@ -81,4 +81,3 @@ class AuthorService:
 
         author = AuthorMapping.dict_to_author_model(payload)
         session.add(author)
-        session.add(ProcessedEvent(event_id=event_id))
