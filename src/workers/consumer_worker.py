@@ -6,13 +6,12 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 from src.models.processed_event import ProcessedEvent
 from src.services.authors import AuthorService
-from src.config.kafka_consumer import Consumer
+from src.config.kafka_consumer import Consumer, TRANSIENT_ERRORS, NON_RETRYABLE_ERRORS
 from src.config.kafka_dlq_publisher import DlqPublisher
 from src.db import async_session_maker
 from src.utils.logger import get_logger
 from src.utils.timeout import kafka_timeout
 from src.config.config import settings
-from src.exceptions.kafka_exceptions import TRANSIENT_ERRORS, NON_RETRYABLE_ERRORS
 
 
 logger = get_logger("consumer_worker")
@@ -108,7 +107,14 @@ class ConsumerWorker:
 
     async def _send_to_dlq(self, msg, error: Exception) -> bool:
         try:
-            value = msg.value.decode('utf-8')
+            value = msg.value.decode("utf-8")
+        except UnicodeDecodeError:
+            value = msg.value.hex()
+            logger.warning(
+                f"[ConsumerWorker] offset={msg.offset} payload is not valid UTF-8, "
+                f"sending as hex to DLQ"
+            )
+        try:
             await self.dlq.send(
                 original_topic=msg.topic,
                 partition=msg.partition,
@@ -126,8 +132,8 @@ class ConsumerWorker:
             return False
 
     async def run(self) -> None:
-        await self.start()
         try:
+            await self.start()
             async for msg in self.consumer:
                 logger.info(
                     f"[ConsumerWorker] received topic={msg.topic} "

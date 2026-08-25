@@ -9,7 +9,6 @@ from src.exceptions.not_found import ObjectNotFound
 
 from src.models.books import BookModel
 from src.models.authors import AuthorModel
-from src.models.processed_event import ProcessedEvent
 
 from src.schemas.authors import AuthorOut, AuthorCreate, AuthorUpdate
 from mapping.author_mapping import AuthorMapping
