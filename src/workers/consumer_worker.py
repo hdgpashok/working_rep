@@ -72,7 +72,7 @@ class ConsumerWorker:
 
         last_error: Exception | None = None
 
-        for attempt in range(0, settings.MAX_RETRIES):
+        for attempt in range(1, settings.MAX_RETRIES + 1):
             try:
                 await self._process_once(payload)
                 logger.info(
@@ -98,7 +98,6 @@ class ConsumerWorker:
                 logger.exception(
                     f"[ConsumerWorker] unexpected error offset={msg.offset}: {e}"
                 )
-                return await self._send_to_dlq(msg, e)
 
         logger.exception(
             f"[ConsumerWorker] retries exhausted offset={msg.offset}: {last_error}"

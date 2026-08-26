@@ -29,25 +29,29 @@ NON_RETRYABLE_ERRORS = (
 class Consumer:
     def __init__(self):
         self.consumer = None
+        self._lock = asyncio.Lock()
 
-    async def start(self):
-        if self.consumer is None:
-            self.consumer = AIOKafkaConsumer(
-                settings.KAFKA_TOPIC,
-                bootstrap_servers=f'{settings.KAFKA_HOST}:{settings.KAFKA_PORT}',
-                group_id=settings.KAFKA_GROUP_ID,
-                enable_auto_commit=False,
-                auto_offset_reset='earliest',
-            )
-            await self.consumer.start()
-        return
+    async def start(self) -> None:
+        async with self._lock:
+            if self.consumer is None:
+                self.consumer = AIOKafkaConsumer(
+                    settings.KAFKA_TOPIC,
+                    bootstrap_servers=f'{settings.KAFKA_HOST}:{settings.KAFKA_PORT}',
+                    group_id=settings.KAFKA_GROUP_ID,
+                    enable_auto_commit=False,
+                    auto_offset_reset='earliest',
+                )
+                await self.consumer.start()
+            return
 
-    async def stop(self):
-        if self.consumer:
-            await self.consumer.stop()
-        return
+    async def stop(self) -> None:
+        async with self._lock:
+            if self.consumer:
+                await self.consumer.stop()
+                self.consumer = None
+            return
 
-    async def commit(self):
+    async def commit(self) -> None:
         if self.consumer:
             await self.consumer.commit()
         return
@@ -58,7 +62,7 @@ class Consumer:
             await self.consumer.commit({tp: offset + 1})
         return
 
-    def __aiter__(self):
+    def __aiter__(self) -> AIOKafkaConsumer:
         if self.consumer is None:
             raise RuntimeError("Consumer is not started")
         return self.consumer.__aiter__()
