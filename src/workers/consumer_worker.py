@@ -4,6 +4,7 @@ import json
 
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
+from src.exceptions.server_error import ServerError
 from src.models.processed_event import ProcessedEvent
 from src.services.authors import AuthorService
 from src.config.kafka_consumer import Consumer, TRANSIENT_ERRORS, NON_RETRYABLE_ERRORS
@@ -98,7 +99,7 @@ class ConsumerWorker:
                 logger.exception(
                     f"[ConsumerWorker] unexpected error offset={msg.offset}: {e}"
                 )
-
+                raise
         logger.exception(
             f"[ConsumerWorker] retries exhausted offset={msg.offset}: {last_error}"
         )
@@ -138,9 +139,15 @@ class ConsumerWorker:
                     f"[ConsumerWorker] received topic={msg.topic} "
                     f"partition={msg.partition} offset={msg.offset}"
                 )
-
-                can_commit = await self._process_with_retry(msg)
-
+                try:
+                    can_commit = await self._process_with_retry(msg)
+                except Exception as e:
+                    logger.exception(
+                        f"[ConsumerWorker] unexpected error, skip commit "
+                        f"offset={msg.offset}: {e}"
+                    )
+                    await asyncio.sleep(1)  # чтобы не крутить CPU при постоянном баге
+                    continue
                 if can_commit:
                     await self.consumer.commit_offset(
                         topic=msg.topic,
