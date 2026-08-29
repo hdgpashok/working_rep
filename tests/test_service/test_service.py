@@ -1,43 +1,59 @@
 import pytest
-
-from unittest.mock import patch
-
-
-from src.services.users import UserService
+from src.exceptions.not_found import ObjectNotFound
+from src.schemas.users import UserUpdate
+from src.schemas.profiles import ProfileUpdate
 
 
 @pytest.mark.asyncio
-async def test_create_user_service(mock_id, mock_create_user, mock_session, mock_cache):
-    user_service = UserService(cache=mock_cache)
+async def test_create_user_service(user_service, user_create_data, session):
+    result = await user_service.create_user_db(user_create_data, session)
 
-    with patch("uuid.uuid4", return_value=mock_id):
-        res = await user_service.create_user_db(mock_create_user, mock_session)
-
-    assert res.id is not None
-    assert res.title == "test"
-
-    assert res.profile.id is not None
-    assert res.profile.title == 'test'
+    assert result.id is not None
+    assert result.title == "developer"
+    assert result.profile.id is not None
+    assert result.profile.title == "profile_title"
+    assert result.profile.bio == "bio"
 
 
 @pytest.mark.asyncio
-async def test_get_user_service(mock_id, mock_session, mock_cache):
-    user_service = UserService(cache=mock_cache)
-    with patch("src.repository.user.UserRepository.select") as mock_select:
-        mock_select.return_value = {
-            "id": mock_id,
-            "title": "test",
-            "profile": {
-                "id": mock_id,
-                "title": "test",
-                "bio": "test_bio"
-            }
-        }
+async def test_get_user_service(user_service, user_create_data, session):
+    created = await user_service.create_user_db(user_create_data, session)
+    await session.commit()
 
-        res = await user_service.get_users_with_profile(mock_id, mock_session)
+    result = await user_service.get_users_with_profile(created.id, session)
 
-    assert res.id == mock_id
-    assert res.title == "test"
-    assert res.profile.id is not None
-    assert res.profile.title == 'test'
-    assert res.profile.bio == "test_bio"
+    assert result.id == created.id
+    assert result.title == "developer"
+    assert result.profile.title == "profile_title"
+    assert result.profile.bio == "bio"
+
+
+@pytest.mark.asyncio
+async def test_update_user_service(user_service, user_create_data, session):
+
+    created = await user_service.create_user_db(user_create_data, session)
+    await session.commit()
+
+    update_data = UserUpdate(
+        title="updated_title",
+        profile=ProfileUpdate(title="updated_profile", bio="updated_bio"),
+    )
+
+    result = await user_service.update_user_db(created.id, update_data, session)
+
+    assert result.id == created.id
+    assert result.title == "updated_title"
+    assert result.profile.title == "updated_profile"
+    assert result.profile.bio == "updated_bio"
+
+
+@pytest.mark.asyncio
+async def test_delete_user_service(user_service, user_create_data, session):
+    created = await user_service.create_user_db(user_create_data, session)
+    await session.commit()
+
+    await user_service.delete_user_db(created.id, session)
+    await session.commit()
+
+    with pytest.raises(ObjectNotFound):
+        await user_service.get_users_with_profile(created.id, session)

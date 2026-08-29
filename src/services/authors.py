@@ -11,6 +11,7 @@ from src.models.books import BookModel
 from src.models.authors import AuthorModel
 
 from src.schemas.authors import AuthorOut, AuthorCreate, AuthorUpdate
+from mapping.author_mapping import AuthorMapping
 
 
 class AuthorService:
@@ -70,3 +71,12 @@ class AuthorService:
 
         await session.delete(author)
         return
+
+    @staticmethod
+    async def create_author_from_message(payload: dict, session: AsyncSession) -> None:
+        event_id = payload.get("id")
+        if not event_id:
+            raise ValueError("payload has no id")
+
+        author = AuthorMapping.dict_to_author_model(payload)
+        session.add(author)

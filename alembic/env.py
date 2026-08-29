@@ -13,6 +13,7 @@ from src.models.books import BookModel
 from src.models.profiles import ProfileModel
 from src.models.theatres import TheatreModel
 from src.models.users import UserModel
+from src.models.processed_event import ProcessedEvent
 
 
 # this is the Alembic Config object , which provides

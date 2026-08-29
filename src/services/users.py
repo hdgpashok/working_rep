@@ -14,8 +14,8 @@ from src.schemas.users import (
 )
 
 from src.utils.logger import get_logger
-from redis_cache import CacheService
-from src.mapping import DataMapping
+from config.redis_cache import CacheService
+from src.mapping.mapping import DataMapping
 
 
 logger = get_logger('service_logger')
@@ -23,7 +23,7 @@ logger = get_logger('service_logger')
 
 class UserService:
 
-    def __init__(self, cache: CacheService):
+    def __init__(self, cache: CacheService | None = None):
         self.cache = cache
         self.repo = UserRepository()
 

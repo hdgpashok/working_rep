@@ -1,90 +1,102 @@
 import pytest
-from src.schemas.users import UserOut
 
 
 @pytest.mark.asyncio
-async def test_route_create_user(mock_client, mock_create_user, mock_user_service):
-    mock_user_service.create_user_db.return_value = UserOut(
-        id="123e4567-e89b-12d3-a456-426614174000",
-        title="string",
-        profile={
-            "id": "123e4567-e89b-12d3-a456-426614174001",
-            "title": "string",
-            "bio": "string"
-        }
-    )
-
-    data = {
-        "title": "string",
-        "profile": {
-            "title": "string",
-            "bio": "string"
-        }
-    }
-
-    response = await mock_client.post(
-        "/users",
-        json=data,
-        follow_redirects=True
+async def test_route_create_user(api_client, user_create_payload):
+    response = await api_client.post(
+        "/api/v1/users_profiles/users",
+        json=user_create_payload,
     )
 
     assert response.status_code == 201
+    data = response.json()
 
-    response_data = response.json()
-
-    assert response_data["id"] is not None
-    assert response_data["title"] == "string"
-    assert response_data["profile"]["title"] == "string"
-    assert response_data["profile"]["bio"] == "string"
+    assert data["id"] is not None
+    assert data["title"] == "developer"
+    assert data["profile"]["title"] == "profile_title"
+    assert data["profile"]["bio"] == "bio"
 
 
 @pytest.mark.asyncio
-async def test_route_get_user(mock_client, mock_id, mock_user_service):
-    mock_user_service.get_users_with_profile.return_value = UserOut(
-        id=mock_id,
-        title="string",
-        profile={
-            "id": mock_id,
-            "title": "string",
-            "bio": "string"
-        }
+async def test_route_get_user(api_client, user_create_payload):
+    create_resp = await api_client.post(
+        "/api/v1/users_profiles/users",
+        json=user_create_payload,
     )
+    assert create_resp.status_code == 201
+    user_id = create_resp.json()["id"]
 
-    mock_user_service.create_user_db.return_value = UserOut(
-        id=mock_id,
-        title="string",
-        profile={
-            "id": mock_id,
-            "title": "string",
-            "bio": "string"
-        }
-    )
-
-    create_data = {
-        "title": "string",
-        "profile": {
-            "title": "string",
-            "bio": "string"
-        }
-    }
-
-    create_response = await mock_client.post(
-        "/users",
-        json=create_data
-    )
-
-    assert create_response.status_code == 201
-
-    created_user = create_response.json()
-    user_id = created_user["id"]
-
-    response = await mock_client.get(f"/users/{user_id}")
-
+    response = await api_client.get(f"/api/v1/users_profiles/users/{user_id}")
     assert response.status_code == 200
 
     data = response.json()
-
     assert data["id"] == user_id
-    assert data["title"] == create_data["title"]
-    assert data["profile"]["title"] == create_data["profile"]["title"]
-    assert data["profile"]["bio"] == create_data["profile"]["bio"]
+    assert data["title"] == "developer"
+    assert data["profile"]["bio"] == "bio"
+
+
+@pytest.mark.asyncio
+async def test_route_update_user(api_client, user_create_payload):
+    create_resp = await api_client.post(
+        "/api/v1/users_profiles/users",
+        json=user_create_payload,
+    )
+    user_id = create_resp.json()["id"]
+
+    update_payload = {
+        "title": "updated_title",
+        "profile": {
+            "title": "updated_profile",
+            "bio": "updated_bio",
+        },
+    }
+
+    response = await api_client.patch(
+        f"/api/v1/users_profiles/users/{user_id}",
+        json=update_payload,
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["title"] == "updated_title"
+    assert data["profile"]["title"] == "updated_profile"
+    assert data["profile"]["bio"] == "updated_bio"
+
+
+@pytest.mark.asyncio
+async def test_route_delete_user(api_client, user_create_payload):
+    create_resp = await api_client.post(
+        "/api/v1/users_profiles/users",
+        json=user_create_payload,
+    )
+    user_id = create_resp.json()["id"]
+
+    response = await api_client.delete(f"/api/v1/users_profiles/users/{user_id}")
+    assert response.status_code == 204
+
+    get_resp = await api_client.get(f"/api/v1/users_profiles/users/{user_id}")
+    assert get_resp.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_route_create_external_user(api_client, mock_id):
+    payload = {
+        "id": str(mock_id),
+        "title": "external_title",
+        "profile": {
+            "id": str(mock_id),
+            "title": "external_profile",
+            "bio": "external_bio",
+        },
+    }
+
+    response = await api_client.post(
+        "/api/v1/users_profiles/external_user",
+        json=payload,
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["id"] == str(mock_id)
+    assert data["title"] == "external_title"
+    assert data["profile"]["title"] == "external_profile"
